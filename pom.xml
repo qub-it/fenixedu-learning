@@ -79,9 +79,13 @@
         </dependency>
     </dependencies>
     <repositories>
+    	<!-- repository>
+			<id>qubIT-repo-public</id>
+           	<url>http://repository.qub-it.com/nexus/content/groups/public</url>
+		</repository-->
         <repository>
             <id>fenixedu-maven-repository</id>
             <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
-        </repository>
-    </repositories>
+    	</repository>
+	</repositories>
 </project>
