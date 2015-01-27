@@ -17,7 +17,7 @@
 
     <properties>
         <version.org.fenixedu.academic>4.1.0-SNAPSHOT</version.org.fenixedu.academic>
-        <version.org.fenixedu.fenixedu-cms>1.0.0</version.org.fenixedu.fenixedu-cms>
+        <version.org.fenixedu.fenixedu-cms>1.1.0-SNAPSHOT</version.org.fenixedu.fenixedu-cms>
         <version.org.fenixedu.bennu-signals>1.0.0</version.org.fenixedu.bennu-signals>
         <version.org.jsoup.jsoup>1.7.2</version.org.jsoup.jsoup>
     </properties>
@@ -31,6 +31,26 @@
 
     <build>
         <plugins>
+			<plugin>
+				<groupId>org.lesscss</groupId>
+				<artifactId>lesscss-maven-plugin</artifactId>
+				<version>1.7.0.1.1</version>
+				<configuration>
+					<sourceDirectory>${project.basedir}/src/main/webapp/themes/fenixedu-learning-theme/less</sourceDirectory>
+					<outputDirectory>${project.basedir}/src/main/webapp/themes/fenixedu-learning-theme/static/css</outputDirectory>
+					<compress>true</compress>
+					<includes>
+						<include>publicPages.less</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>		
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
