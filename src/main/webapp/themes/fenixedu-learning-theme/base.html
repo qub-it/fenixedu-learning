@@ -9,20 +9,27 @@
     <meta name="Keywords" content="FenixEdu, open-source, academic, information, platform, academic administration, higher education, e-learning" />
     <meta name="Language" content="{{app.locale}}" />
     <meta name="Robots" content="all" />
+    
+    {% block copyrightMeta %}
+    <!--
     <meta name="Author" content="FenixEdu" />
     <meta name="Email" content="hello@fenixedu.org" />
     <meta name="Copyright" content="Técnico Lisboa - Instituto Superior Técnico" />
     <meta name="Distribution" content="Global" />
     <meta name="Rating" content="General" />
+    -->
+    {% endblock copyrightMeta %}
 
     <!-- OpenGraph Specific Metas -->
     {% block openGraphMeta %}
+    <!--
     <meta property="og:title" content="FenixEdu™" />
     <meta property="og:type" content="application" />
     <meta property="og:url" content="http://www.fenixedu.org" />
     <meta property="og:site_name" content="FenixEdu" />
     <meta property="og:description" content="FenixEdu Learning is an open-source academic information platform." />
     <meta property="fb:profile_id" content="379238245509413" />
+    -->
     {% endblock openGraphMeta %}
 
     <!-- Mobile Specific Metas -->
@@ -152,7 +159,7 @@
 
     <footer class="container fenixedu-footer">
       <div class="col-sm-9">
-        <a class="brand" href="http://fenixedu.org"><img width="150" src="{{staticDir}}/images/logo_fenixedu_footer.svg" alt="Powered by FenixEdu"></a>
+        <a class="brand" href="http://www.qub-it.com/homepage"><img width="150" src="{{staticDir}}/images/fenixedu-qubit.png" alt="FenixEdu brought to you by qubIT"></a>
       </div>
 
       <div class="col-sm-3 text-left" style="color:#888">

@@ -143,6 +143,11 @@
             "name": "Researcher Data Section",
             "description": "Page used for homepage owner's researcher data.",
             "file": "researcherSection.html"
+        },
+        "siteMap": {
+            "name": "Site Map",
+            "description": "Blank page template to be filled with the degree site URLs.",
+            "file": "sitemap.html"
         }
     }
 }
