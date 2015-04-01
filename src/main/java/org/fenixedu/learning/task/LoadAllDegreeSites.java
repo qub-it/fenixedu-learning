@@ -1,13 +1,8 @@
 package org.fenixedu.learning.task;
 
-import static com.google.common.base.Joiner.on;
-
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.portal.domain.MenuContainer;
-import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
-import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.learning.domain.degree.DegreeSite;
 import org.fenixedu.learning.domain.degree.DegreeSiteListener;
 
