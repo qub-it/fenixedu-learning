@@ -27,7 +27,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.fenixedu.academic.domain.*;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.service.services.teacher.PublishMarks;
@@ -53,6 +55,7 @@ import org.fenixedu.cms.ui.AdminThemes;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.learning.domain.degree.DegreeRequestHandler;
+import org.fenixedu.learning.domain.degree.DegreeSiteListener;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseListener;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseRequestHandler;
 import org.fenixedu.learning.domain.executionCourse.SummaryListener;
@@ -68,10 +71,9 @@ import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 @WebListener
 public class FenixEduLearningContextListener implements ServletContextListener {
-    
+
     private final static Logger logger = LoggerFactory.getLogger(FenixEduLearningContextListener.class);
-    
-    
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         Signal.register(Summary.CREATE_SIGNAL, (DomainObjectEvent<Summary> event) -> {
@@ -88,16 +90,20 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         Signal.register(Summary.EDIT_SIGNAL, (DomainObjectEvent<Summary> event) -> {
             SummaryListener.updatePost(event.getInstance().getPost(), event.getInstance());
         });
-
         Signal.register(ExecutionCourse.CREATED_SIGNAL, (DomainObjectEvent<ExecutionCourse> event) -> {
             ExecutionCourseListener.create(event.getInstance());
         });
+
         Signal.register(ExecutionCourse.ACRONYM_CHANGED_SIGNAL, (DomainObjectEvent<ExecutionCourse> event) -> {
             ExecutionCourseListener.updateSiteSlug(event.getInstance());
         });
 
         Signal.register(ProfessorshipPermissions.PROFESSORSHIP_PERMISSIONS_CHANGED, (DomainObjectEvent<ProfessorshipPermissions> event) ->
                 ExecutionCourseListener.updateProfessorship(event.getInstance().getProfessorship(),event.getInstance().getSections()));
+
+        Signal.register(Degree.CREATED_SIGNAL, (DomainObjectEvent<Degree> event) -> {
+            DegreeSiteListener.create(event.getInstance());
+        });
 
         Signal.register(PublishMarks.MARKS_PUBLISHED_SIGNAL, FenixEduLearningContextListener::handleMarksPublishment);
         Signal.register(Thesis.PROPOSAL_APPROVED_SIGNAL, FenixEduLearningContextListener::handleThesisProposalApproval);
