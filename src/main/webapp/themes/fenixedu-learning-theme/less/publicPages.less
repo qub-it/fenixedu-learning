@@ -1,6 +1,7 @@
 
-@brand-primary:         #836dab;
-@body-bg:               lighten(@brand-primary, 40%);
+@brand-primary:         #212121;
+@body-bg:               lighten(@brand-primary, 75%);
+@selected-item-bg:		lighten(@brand-primary, 17%);
 
 body {
 	background-color: @body-bg;
@@ -43,7 +44,7 @@ main>div>.top-lead {
 }
 
 .nav-pills>li>a.item:hover, .nav-pills>li>a.item:focus {
-	background: lighten(@brand-primary, 20%);
+	background: @selected-item-bg;
     color: #fff;
     border-radius: 0;
     border-bottom-right-radius: 20px;
@@ -124,6 +125,11 @@ main>div>.top-lead {
 
 .fenixedu-bar .devmode{
 	font-size:12px
+}
+
+.fenixedu-footer {
+	border-top: 1px solid @selected-item-bg;
+	margin-top: 30px;
 }
 
 nav {
