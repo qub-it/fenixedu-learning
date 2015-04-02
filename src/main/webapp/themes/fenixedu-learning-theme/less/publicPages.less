@@ -1,6 +1,6 @@
 
-@brand-primary:         #6B607F;
-@body-bg:               lighten(@brand-primary, 50%);
+@brand-primary:         #836dab;
+@body-bg:               lighten(@brand-primary, 40%);
 
 body {
 	background-color: @body-bg;
@@ -37,14 +37,28 @@ main>div>.top-lead {
 	border-bottom: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 	color:#444;
-	margin-left: -2px;
-	border-radius: 0px;
+	border-radius: 0;
+	border-bottom-right-radius: 20px;
+	border-top-right-radius: 20px;
+}
+
+.nav-pills>li>a.item:hover, .nav-pills>li>a.item:focus {
+	background: lighten(@brand-primary, 20%);
+    color: #fff;
+    border-radius: 0;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.nav-pills>li:hover>a.rsslink, .nav-pills>li:focus>a.rsslink {
+    color: #fff;
 }
 
 .nav-pills>li>a.item {
 	color: #444;
-		padding: 8px 25px;
-		font-size: 13px;
+	padding: 8px 25px;
+	font-size: 13px;
+	font-weight: bold;
 }
 
 .nav-pills>li>a.item {
@@ -193,12 +207,17 @@ li li>a{
 }
 
 .rsslink:hover{
+	color: @brand-primary !important;
 	background: none !important;
 }
 
 .active .rsslink{
 	background: none !important;
 	color: @brand-primary!important;
+}
+
+.branded {
+	color: @brand-primary;
 }
 
 #content-block {
@@ -232,3 +251,18 @@ li li>a{
 	background-repeat: repeat-x;
 	filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(rgba(255, 255, 255, 0)  ),argb(rgba(255, 255, 255, 1)  )));
 }
+
+#content-block:before {
+  content: "";
+  position: absolute;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@brand-primary), to(transparent));
+  background-image: -webkit-linear-gradient(@brand-primary, transparent);
+  background-image: -moz-linear-gradient(@brand-primary, transparent);
+  background-image: -o-linear-gradient(@brand-primary, transparent);
+  background-image: linear-gradient(@brand-primary, transparent);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  left: 0;
+}
+

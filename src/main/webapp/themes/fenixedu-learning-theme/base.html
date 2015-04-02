@@ -15,12 +15,14 @@
     <meta name="Rating" content="General" />
 
     <!-- OpenGraph Specific Metas -->
+    {% block openGraphMeta %}
     <meta property="og:title" content="FenixEdu™" />
     <meta property="og:type" content="application" />
     <meta property="og:url" content="http://www.fenixedu.org" />
     <meta property="og:site_name" content="FenixEdu" />
     <meta property="og:description" content="FenixEdu Learning is an open-source academic information platform." />
     <meta property="fb:profile_id" content="379238245509413" />
+    {% endblock openGraphMeta %}
 
     <!-- Mobile Specific Metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.5">
@@ -68,25 +70,48 @@
   <body>
 
     {% block topbar %}
+    <!-- Bar -->
+    <div class="navbar navbar-inverse hidden-xs fenixedu-bar">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{{request.contextPath}}/" target="_blank">{{app.title.content}}</a></li>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+          <li></li>
+            {% if page.user == null %}
+              <li><a href="{{request.contextPath}}/login">Login</a></li>
+            {% else %}
+              <li><a><img src="{{page.user.avatar}}?s=20" width="20" heigth="20" style="margin-right: 10px" class="img-circle"/>{{page.user.displayName}}</a></li>
+              {% if devMode %}
+                <li class="devmode active"><a>Debug Mode</a></li>
+              {% endif %}
+              <li class="active"><a href="{{request.contextPath}}/logout">Logout</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
     {% endblock %}
-	<div id="headcounter">
-		<div class="container">
+
+  	<div id="headcounter">
+  		<div class="container">
 			
 
-		<div class="row" style="padding-top:50px; padding-bottom:25px;" >
-			<div class="col-sm-9">
-        <div>
-				  <img class="logo" src="{{request.contextPath}}/api/bennu-portal/configuration/logo" />
-        </div>
-			</div>
-			<div class="col-sm-3 ">
-        <div >
-	           
-        </div>
-			</div>
-		</div>
-		</div>
-	</div>
+  		<div class="row" style="padding-top:60px; padding-bottom:30px;" >
+  			<div class="col-sm-9">
+          <div>
+  				  <img class="logo" src="{{request.contextPath}}/api/bennu-portal/configuration/logo" />
+          </div>
+  			</div>
+  			<div class="col-sm-3 ">
+          <div >
+  	           
+          </div>
+  			</div>
+  		</div>
+  		</div>
+  	</div>
 	
 		<div class="container">
       <div class="row">
@@ -97,8 +122,8 @@
               {% if site.siteObject.executionPeriod is not empty %}{{site.siteObject.executionPeriod.semester}}º semestre {{site.siteObject.executionPeriod.executionYear.year}}{% else %}&nbsp;{% endif %}</small></div>          
         </div>
         <div class="col-sm-3 hidden-xs">
-              <div style="margin-top: 25px;">
-                <img src="{{staticDir}}/images/icon_global.svg" width="13" height="13" style="margin-bottom:2px;margin-right:10px"/>
+              <div style="margin-top: 6px; margin-top: 25px;">
+                <i class="glyphicon glyphicon-globe branded" style="padding-right:10px;"></i>
                   {% for locale in app.supportedLocales %}
                       <a class="locale-changer {% if locale == app.locale %}active{% endif %}" title="{{locale.displayName}}" onclick="setLang('{{locale}}')">{{locale.language}}</a>
                   {% endfor %}
