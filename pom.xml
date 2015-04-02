@@ -29,6 +29,7 @@
         <version.org.fenixedu.fenixedu-cms>3.0.4</version.org.fenixedu.fenixedu-cms>
         <version.org.fenixedu.fenixedu-commons>1.1.2</version.org.fenixedu.fenixedu-commons>
         <version.org.fenixedu.fenixedu-spaces>2.0.2</version.org.fenixedu.fenixedu-spaces>
+        <version.org.jsoup.jsoup>1.7.2</version.org.jsoup.jsoup>
     </properties>
 
     <issueManagement>
@@ -58,6 +59,26 @@
 
     <build>
         <plugins>
+			<plugin>
+				<groupId>org.lesscss</groupId>
+				<artifactId>lesscss-maven-plugin</artifactId>
+				<version>1.7.0.1.1</version>
+				<configuration>
+					<sourceDirectory>${project.basedir}/src/main/webapp/themes/fenixedu-learning-theme/less</sourceDirectory>
+					<outputDirectory>${project.basedir}/src/main/webapp/themes/fenixedu-learning-theme/static/css</outputDirectory>
+					<compress>true</compress>
+					<includes>
+						<include>publicPages.less</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>		
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -143,6 +164,11 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
             <version>${version.javax.ws.rs.javax.ws.rs.api}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${version.org.jsoup.jsoup}</version>
         </dependency>
     </dependencies>
 
