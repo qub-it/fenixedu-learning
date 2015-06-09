@@ -99,10 +99,11 @@
         </dependency>
     </dependencies>
     <repositories>
-    	<!-- repository>
-			<id>qubIT-repo-public</id>
-           	<url>http://repository.qub-it.com/nexus/content/groups/public</url>
-		</repository-->
+        <!-- this repo is not supposed to be pull requested to the fenixedu project -->
+        <repository>
+            <id>ulisboa-repo</id>
+            <url>http://nexjen.ulisboa.pt/nexus/content/groups/public/</url>
+        </repository>
         <repository>
             <id>fenixedu-maven-repository</id>
             <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
