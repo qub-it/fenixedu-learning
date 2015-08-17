@@ -90,7 +90,7 @@
             {% if page.user == null %}
               <li><a href="{{request.contextPath}}/login">Login</a></li>
             {% else %}
-              <li><a><img src="{{page.user.avatar}}?s=20" width="20" heigth="20" style="margin-right: 10px" class="img-circle"/>{{page.user.displayName}}</a></li>
+              <li><a>{{page.user.displayName}}</a></li>
               {% if devMode %}
                 <li class="devmode active"><a>Debug Mode</a></li>
               {% endif %}
