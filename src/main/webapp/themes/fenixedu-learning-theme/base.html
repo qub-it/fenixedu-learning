@@ -87,10 +87,10 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-right">
           <li></li>
-            {% if page.user == null %}
+            {% if request.user is null %}
               <li><a href="{{request.contextPath}}/login">Login</a></li>
             {% else %}
-              <li><a>{{page.user.displayName}}</a></li>
+              <li><a>{{request.user.displayName}}</a></li>
               {% if devMode %}
                 <li class="devmode active"><a>Debug Mode</a></li>
               {% endif %}
