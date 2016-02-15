@@ -4,7 +4,7 @@
 
 {% set noEvaluations = adHocEvaluations is empty and projects is empty and publishedExams is empty and writtenTests is empty %}
 {% if noEvaluations  %}
-    <h4>Currently there are no evaluations scheduled.</h4>
+    <em>{{ i18n('resources.FenixEduLearningResources', 'label.noEvaluations') }}</em>
 {% else %}
     {% if comment is not empty %}
         <p>*) {{ comment }}</p>
