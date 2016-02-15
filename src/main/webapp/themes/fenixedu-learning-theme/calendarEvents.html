@@ -29,6 +29,25 @@
         var i18nDayNamesShort = i18nDayNames.map(function(el){
             return el.substr(0,3);
         });
+        
+        var i18nMonthNames = [
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.january') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.february') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.march') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.april') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.may') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.june') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.july') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.august') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.september') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.october') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.november') }}",
+   			"{{ i18n('resources.FenixEduLearningResources', 'month.december') }}"
+   		];
+        
+        var i18nMonthNamesShort = i18nMonthNames.map(function(el){
+            return el.substr(0,3);
+        });
 
 		var config = {
 			firstDay: 1,
@@ -43,6 +62,8 @@
 			slotEventOverlap: false,
 			dayNames: i18nDayNames,
 			dayNamesShort: i18nDayNamesShort,
+			monthNames: i18nMonthNames,
+			monthNamesShort: i18nMonthNamesShort,
 			eventAfterRender: afterEventsRender,
 			events: "{{eventsUrl}}",
             header: {
@@ -51,7 +72,13 @@
                 right: 'month,agendaWeek,basicDay'
             },
 			eventLimit: true,
-			editable: false
+			editable: false,
+			buttonText: {
+			    today:    "{{ i18n('resources.FenixEduLearningResources', 'label.calendar.today') }}",
+			    month:    "{{ i18n('resources.FenixEduLearningResources', 'label.calendar.month') }}",
+			    week:     "{{ i18n('resources.FenixEduLearningResources', 'label.calendar.week') }}",
+			    day:      "{{ i18n('resources.FenixEduLearningResources', 'label.calendar.day') }}"
+			}
 		};
 
 		$(document).ready(function() {
