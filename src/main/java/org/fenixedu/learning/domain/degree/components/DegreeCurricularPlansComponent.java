@@ -18,6 +18,9 @@
  */
 package org.fenixedu.learning.domain.degree.components;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.Degree;
@@ -41,8 +44,8 @@ public class DegreeCurricularPlansComponent extends DegreeSiteComponent {
 
         Optional<ExecutionYear> executionYear = getSelectedExecutionYear(globalContext.getRequestContext());
         if (executionYear.isPresent()) {
-            globalContext.put("degreeCurricularPlan", degree.getDegreeCurricularPlansForYear(executionYear.get()).stream()
-                    .findFirst().get());
+            globalContext.put("degreeCurricularPlan",
+                    degree.getDegreeCurricularPlansForYear(executionYear.get()).stream().findFirst().get());
             globalContext.put("executionYear", executionYear.get());
         } else {
             DegreeCurricularPlan degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
@@ -51,7 +54,10 @@ public class DegreeCurricularPlansComponent extends DegreeSiteComponent {
                 globalContext.put("executionYear", degreeCurricularPlan.getMostRecentExecutionYear());
             }
         }
-        globalContext.put("executionYears", degree.getDegreeCurricularPlansExecutionYears());
+
+        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        Collections.sort(years, Comparator.reverseOrder());
+        globalContext.put("executionYears", years);
     }
 
     private Optional<ExecutionYear> getSelectedExecutionYear(String[] requestContext) {

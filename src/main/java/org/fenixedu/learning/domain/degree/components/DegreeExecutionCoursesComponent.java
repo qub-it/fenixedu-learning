@@ -20,6 +20,9 @@ package org.fenixedu.learning.domain.degree.components;
 
 import static org.fenixedu.academic.domain.ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -30,6 +33,7 @@ import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
@@ -39,6 +43,7 @@ import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
 
 import com.google.common.collect.Maps;
+
 
 /**
  * Created by borgez on 10/8/14.
@@ -50,7 +55,10 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         Degree degree = degree(page);
         globalContext.put("executionCoursesBySemesterAndCurricularYear", executionCourses(degree));
-        globalContext.put("executionYears", degree.getDegreeCurricularPlansExecutionYears());
+
+        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        Collections.sort(years, Comparator.reverseOrder());
+        globalContext.put("executionYears", years);
     }
 
     public SortedMap<ExecutionSemester, SortedMap<Integer, SortedSet<ExecutionCourse>>> executionCourses(final Degree degree) {
@@ -86,8 +94,8 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
                         for (final ExecutionCourse executionCourse : curricularCourse.getAssociatedExecutionCoursesSet()) {
                             if (executionCourse.getExecutionPeriod() == executionSemester) {
                                 courses.computeIfAbsent(context.getCurricularYear(),
-                                        i -> new TreeSet<ExecutionCourse>(ExecutionCourse.EXECUTION_COURSE_NAME_COMPARATOR)).add(
-                                        executionCourse);
+                                        i -> new TreeSet<ExecutionCourse>(ExecutionCourse.EXECUTION_COURSE_NAME_COMPARATOR))
+                                        .add(executionCourse);
                             }
                         }
                     } else {
