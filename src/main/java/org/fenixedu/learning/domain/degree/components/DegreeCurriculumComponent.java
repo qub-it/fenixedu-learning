@@ -74,8 +74,8 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
     SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(Degree degree, ExecutionYear year,
             String pageUrl) {
-        return allCurricularCourses(courseGroups(degree, year, pageUrl).collect(toSet())).collect(
-                groupingBy(CurricularCourseWrap::getCurricularPeriod, TreeMap::new, toCollection(TreeSet::new)));
+        return allCurricularCourses(courseGroups(degree, year, pageUrl).collect(toSet()))
+                .collect(groupingBy(CurricularCourseWrap::getCurricularPeriod, TreeMap::new, toCollection(TreeSet::new)));
     }
 
     Stream<CurricularCourseWrap> allCurricularCourses(Collection<CourseGroupWrap> fathers) {
@@ -85,7 +85,8 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
     }
 
     Stream<CourseGroupWrap> courseGroups(Degree degree, ExecutionYear year, String pageUrl) {
-        return degree.getDegreeCurricularPlansForYear(year).stream().filter(plan -> plan.isApproved() && plan.isActive())
+        return degree.getDegreeCurricularPlansForYear(year).stream()
+                .filter(plan -> plan.isApproved() && plan.isActive() && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty())
                 .map(plan -> new CourseGroupWrap(null, plan.getRoot(), year, pageUrl));
     }
 
@@ -134,9 +135,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public Stream<CourseGroupWrap> getCourseGroups() {
-            return courseGroup
-                    .getSortedOpenChildContextsWithCourseGroups(executionInterval)
-                    .stream()
+            return courseGroup.getSortedOpenChildContextsWithCourseGroups(executionInterval).stream()
                     .map(context -> new CourseGroupWrap(context, (CourseGroup) context.getChildDegreeModule(), executionInterval,
                             pageUrl));
         }
