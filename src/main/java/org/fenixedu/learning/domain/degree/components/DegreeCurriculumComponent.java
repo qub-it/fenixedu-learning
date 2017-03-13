@@ -27,6 +27,9 @@ import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -51,6 +54,7 @@ import org.fenixedu.commons.i18n.LocalizedString;
 
 import com.google.common.base.Strings;
 
+
 /**
  * Created by borgez on 10/10/14.
  */
@@ -67,7 +71,11 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
                 allCurricularCourses(courseGroups(degree, selectedYear, pageUrl).collect(toSet())));
 
         globalContext.put("coursesByCurricularSemester", coursesByCurricularSemester(degree, selectedYear, pageUrl));
-        globalContext.put("years", degree.getDegreeCurricularPlansExecutionYears());
+
+        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        Collections.sort(years, Comparator.reverseOrder());
+        globalContext.put("years", years);
+
         globalContext.put("selectedYear", selectedYear);
     }
 
