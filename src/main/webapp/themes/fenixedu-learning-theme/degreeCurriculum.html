@@ -17,9 +17,9 @@
 				<p>
 					<span class="context-info">
 						{% if curricularCourse.isSemestrial %}
-							Semestral
+							{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.semestral') }}
 						{% else %}
-							Anual
+							{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.anual') }}
 						{% endif %}
 					</span>
 					{% if curricularCourse.isOptional %}
@@ -117,13 +117,13 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="active">
         	<a href="#byGroups" role="tab" data-toggle="tab">
-        		Grupos
+        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byGroups') }}
         	</a>
     	</li>
 
         <li>
         	<a href="#bySemesters" role="tab" data-toggle="tab">
-        		Ano/Semestre
+        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byYearAndSemester') }}        		
         	</a>
     	</li>
     </ul>
@@ -131,7 +131,7 @@
 	<br />
 	<div>
 		<button class="btn btn-sm btn-default pull-right" type="button" id="rules_button">
-			Show Rules
+			{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.showRules') }}
 		</button>
 		<div class="dropdown pull-right">
 			<button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -169,7 +169,7 @@
 
 	<script type="text/javascript">
 		$('.rules').hide();
-		var names = ['Show Rules', 'Hide Rules'];
+		var names = ['{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.showRules') }}', '{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.hideRules') }}'];
 		var selectedNamePosition = 0;
 		$('#rules_button').click(function(){
 			selectedNamePosition = (selectedNamePosition + 1) % names.length;
