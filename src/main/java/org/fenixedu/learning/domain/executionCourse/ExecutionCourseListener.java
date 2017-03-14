@@ -37,10 +37,8 @@ import org.fenixedu.learning.domain.executionCourse.components.BibliographicRefe
 import org.fenixedu.learning.domain.executionCourse.components.EvaluationMethodsComponent;
 import org.fenixedu.learning.domain.executionCourse.components.EvaluationsComponent;
 import org.fenixedu.learning.domain.executionCourse.components.ExecutionCourseComponent;
-import org.fenixedu.learning.domain.executionCourse.components.GroupsComponent;
 import org.fenixedu.learning.domain.executionCourse.components.InitialPageComponent;
 import org.fenixedu.learning.domain.executionCourse.components.LessonPlanComponent;
-import org.fenixedu.learning.domain.executionCourse.components.MarksComponent;
 import org.fenixedu.learning.domain.executionCourse.components.ObjectivesComponent;
 import org.fenixedu.learning.domain.executionCourse.components.ScheduleComponent;
 
@@ -88,10 +86,9 @@ public class ExecutionCourseListener {
         //Component inquiriesResultsComponent = forType(InquiriesResultsComponent.class);
         Component homeComponent = forType(InitialPageComponent.class);
 
-        Page initialPage =
-                Page.create(site, menu, null, INITIAL_PAGE_TITLE, true, "firstPage", author, homeComponent,
-                        announcementsComponent);
-        Page.create(site, menu, null, GROUPS_TITLE, true, "groupings", author, forType(GroupsComponent.class));
+        Page initialPage = Page.create(site, menu, null, INITIAL_PAGE_TITLE, true, "firstPage", author, homeComponent,
+                announcementsComponent);
+        // qubExtensions Page.create(site, menu, null, GROUPS_TITLE, true, "groupings", author, forType(GroupsComponent.class));
         Page.create(site, menu, null, EVALUATIONS_TITLE, true, "evaluations", author, forType(EvaluationsComponent.class));
         Page.create(site, menu, null, REFERENCES_TITLE, true, "bibliographicReferences", author, referencesComponent);
         Page.create(site, menu, null, SCHEDULE_TITLE, true, "calendarEvents", author, forType(ScheduleComponent.class));
