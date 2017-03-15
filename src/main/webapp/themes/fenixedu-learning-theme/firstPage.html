@@ -134,7 +134,7 @@
 
 						<!-- extra information -->
 						<div role="tabpanel" class="tab-pane active" id="info">
-							{% if site.description is not empty %}
+							{% if site.description is not empty and site.description.content is not empty %}
 								<h5>{{ i18n('resources.FenixEduLearningResources', 'degree.description.title') }}:</h5>
 								{{ site.description.content }}
 							{% endif %}
@@ -205,6 +205,5 @@
 
 
 	{% block titleLink %}
-<a style="padding-left:20px; font-size:15px; color:#009EE2; font-weight:300" href="#" data-toggle="modal" data-target="#myModal">+
-	Info</a>
+<a style="padding-left:20px; font-size:15px; color:#009EE2; font-weight:300" href="#" data-toggle="modal" data-target="#myModal">+ Info</a>
 {% endblock titleLink %}
