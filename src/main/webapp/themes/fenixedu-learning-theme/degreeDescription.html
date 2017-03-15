@@ -93,7 +93,7 @@
             </td>
           </tr>
         {% endif %}
-            {% if degreeInfo.links is not empty %}
+            {% if degreeInfo.links is not empty and degreeInfo.links.content is not empty %}
               {{ titleRow('public.degree.information.label.links') }}
           <tr>
                 <td>
