@@ -47,6 +47,7 @@ import org.fenixedu.academic.util.CurricularPeriodLabelFormatter;
 import org.fenixedu.academic.util.CurricularRuleLabelFormatter;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.cms.domain.Page;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.domain.wraps.Wrap;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -55,17 +56,19 @@ import org.fenixedu.commons.i18n.LocalizedString;
 
 import com.google.common.base.Strings;
 
-
 /**
  * Created by borgez on 10/10/14.
  */
 @ComponentType(name = "Degree Curriculum", description = "Curriculum for a degree")
 public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
+    private Site site;
+
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         Degree degree = degree(page);
-        String pageUrl = pageForComponent(page.getSite(), CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
+        site = page.getSite();
+        String pageUrl = pageForComponent(site, CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
         ExecutionYear selectedYear = selectedYear((String) globalContext.get("year"), degree);
         globalContext.put("courseGroups", courseGroups(degree, selectedYear, pageUrl));
         globalContext.put("allCurricularCourses",
@@ -147,6 +150,35 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
                     .map(context -> new CourseGroupWrap(context, (CourseGroup) context.getChildDegreeModule(), executionInterval,
                             pageUrl));
         }
+
+        public String getExternalId() {
+            return courseGroup.getExternalId();
+        }
+
+        public String buildImage() {
+            final String oid = getExternalId();
+            return String.format(
+                    "<img id=\"aa%s\" src=\"%s\" onclick=\"toggleImage($('#aa%s'));toggleCheck($('#%s'));return false\">", oid,
+                    getInitialImage(), oid, oid);
+        }
+
+        public String getInitialStyle() {
+            return courseGroup.getIsOptional() == Boolean.TRUE ? "display:none" : "";
+        }
+
+        private String getInitialImage() {
+            final String result;
+            if (Strings.isNullOrEmpty(getInitialStyle())) {
+                // collapse
+                result = "toggle_minus10.gif";
+            } else {
+                // expand
+                result = "toggle_plus10.gif";
+            }
+
+            return site.getStaticDirectory() + "/images/" + result;
+        }
+
     }
 
     private class CurricularCourseWrap extends Wrap implements Comparable<CurricularCourseWrap> {
