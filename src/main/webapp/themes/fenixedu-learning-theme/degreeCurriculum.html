@@ -79,9 +79,9 @@
 	{% set bundle = 'resources.ApplicationResources' %}
 	{% lazyFor courseGroup in courseGroups %}
 
-		<h4>{{ courseGroup.name.content }}</h4>
-		<hr />
-		<div class="level">
+        <h4>{{ courseGroup.buildImage }} {{ courseGroup.name.content }}</h4>
+        <hr />
+		<div class="level" id="{{courseGroup.externalId}}" style="{{courseGroup.initialStyle}}">
 			<!-- RULES -->
 			<div class="rules">
 				{% if courseGroup.rules.count > 0 %}
@@ -176,7 +176,36 @@
 			$('.rules').fadeToggle();
 			$('#rules_button').html(names[selectedNamePosition]);
 		});	
+
+        function toggleImage(e) {
+            var expand = 'toggle_plus10.gif'
+            var collapse = 'toggle_minus10.gif'
+            
+            var current = e.attr('src');
+            var changed = current;
+            if (current.indexOf(collapse) > 0) {
+                changed = current.replace(collapse, expand);
+            } else {
+                changed = current.replace(expand, collapse);
+            }
+            
+            e.attr('src', changed);
+        }
+        
+        function toggleCheck(e) {
+            var current = e.css('display');
+            var changed = current;
+            if (current == "none") {
+                changed = "";
+            } else {
+                changed = "none";
+            }
+            
+            e.css('display', changed);
+        }
+        
 	</script>
+    
 
 	<style type="text/css">
 		.level {
