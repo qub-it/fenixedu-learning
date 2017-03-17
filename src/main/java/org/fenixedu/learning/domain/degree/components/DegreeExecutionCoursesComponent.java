@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -41,9 +42,9 @@ import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 
 import com.google.common.collect.Maps;
-
 
 /**
  * Created by borgez on 10/8/14.
@@ -57,6 +58,7 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
         globalContext.put("executionCoursesBySemesterAndCurricularYear", executionCourses(degree));
 
         final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        // qubExtension
         Collections.sort(years, Comparator.reverseOrder());
         globalContext.put("executionYears", years);
     }
@@ -79,7 +81,13 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
 
     public SortedMap<Integer, SortedSet<ExecutionCourse>> executionCourses(Degree degree, ExecutionSemester executionSemester) {
         SortedMap<Integer, SortedSet<ExecutionCourse>> courses = new TreeMap<>();
-        degree.getActiveDegreeCurricularPlans().forEach(plan -> addExecutionCourses(plan.getRoot(), courses, executionSemester));
+
+        if (executionSemester != null) {
+            DegreeCurricularPlanServices
+                    .getDegreeCurricularPlansForYear(degree, Optional.of(executionSemester.getExecutionYear()))
+                    .forEach(plan -> addExecutionCourses(plan.getRoot(), courses, executionSemester));
+        }
+
         return courses;
     }
 

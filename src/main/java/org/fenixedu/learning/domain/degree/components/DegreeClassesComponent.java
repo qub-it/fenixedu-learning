@@ -28,6 +28,7 @@ import static org.fenixedu.academic.util.PeriodState.OPEN;
 import static org.fenixedu.bennu.core.security.Authenticate.getUser;
 import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -43,6 +44,7 @@ import org.fenixedu.academic.dto.InfoDegree;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 
 import com.google.common.collect.Sets;
 
@@ -68,15 +70,11 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
     }
 
     private SortedMap<Integer, Set<SchoolClass>> classesByCurricularYear(Degree degree, ExecutionSemester semester) {
-        DegreeCurricularPlan plan = degree.getMostRecentDegreeCurricularPlan();
+        DegreeCurricularPlan plan =
+                DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(semester.getExecutionYear()));
         Predicate<SchoolClass> predicate = schoolClass -> schoolClass.getExecutionDegree().getDegreeCurricularPlan() == plan;
-        return semester
-                .getSchoolClassesSet()
-                .stream()
-                .filter(predicate)
-                .collect(
-                        groupingBy(SchoolClass::getAnoCurricular, TreeMap::new,
-                                toCollection(() -> Sets.newTreeSet(COMPARATOR_BY_NAME))));
+        return semester.getSchoolClassesSet().stream().filter(predicate).collect(
+                groupingBy(SchoolClass::getAnoCurricular, TreeMap::new, toCollection(() -> Sets.newTreeSet(COMPARATOR_BY_NAME))));
     }
 
     private ExecutionSemester getOtherExecutionSemester(ExecutionSemester semester) {
@@ -88,9 +86,8 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
         Predicate<Person> hasPerson = person -> person != null;
         Predicate<Person> isCoordinator = person -> RoleType.COORDINATOR.isMember(person.getUser());
         Predicate<Person> isManager = person -> RoleType.RESOURCE_ALLOCATION_MANAGER.isMember(person.getUser());
-        return nextExecutionSemester.getState() == OPEN
-                || (nextExecutionSemester.getState() == NOT_OPEN && getUser() != null && hasPerson.and(
-                        isManager.or(isCoordinator)).test(getUser().getPerson()));
+        return nextExecutionSemester.getState() == OPEN || (nextExecutionSemester.getState() == NOT_OPEN && getUser() != null
+                && hasPerson.and(isManager.or(isCoordinator)).test(getUser().getPerson()));
     }
 
     private ExecutionSemester getExecutionSemester(String[] requestContext) {
