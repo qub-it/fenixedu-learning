@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 import org.fenixedu.academic.domain.degreeStructure.Context;
@@ -53,6 +55,7 @@ import org.fenixedu.cms.domain.wraps.Wrap;
 import org.fenixedu.cms.rendering.TemplateContext;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 
 import com.google.common.base.Strings;
 
@@ -77,6 +80,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         globalContext.put("coursesByCurricularSemester", coursesByCurricularSemester(degree, selectedYear, pageUrl));
 
         final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        // qubExtension
         Collections.sort(years, Comparator.reverseOrder());
         globalContext.put("years", years);
 
@@ -96,21 +100,26 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
     }
 
     Stream<CourseGroupWrap> courseGroups(Degree degree, ExecutionYear year, String pageUrl) {
-        return degree.getDegreeCurricularPlansForYear(year).stream()
-                .filter(plan -> plan.isApproved() && plan.isActive() && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty())
+        return DegreeCurricularPlanServices.getDegreeCurricularPlansForYear(degree, Optional.of(year)).stream()
                 .map(plan -> new CourseGroupWrap(null, plan.getRoot(), year, pageUrl));
     }
 
     ExecutionYear selectedYear(String year, Degree degree) {
+        ExecutionYear result = readCurrentExecutionYear();
+
         if (!Strings.isNullOrEmpty(year)) {
-            return getDomainObject(year);
+            result = getDomainObject(year);
+
         } else {
-            if (degree.getLastActiveDegreeCurricularPlan() != null) {
-                return degree.getLastActiveDegreeCurricularPlan().getLastExecutionYear();
-            } else {
-                return readCurrentExecutionYear();
+            final DegreeCurricularPlan dcp =
+                    DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.empty());
+
+            if (dcp != null) {
+                result = dcp.getLastExecutionYear();
             }
         }
+
+        return result;
     }
 
     private class CourseGroupWrap extends Wrap {
