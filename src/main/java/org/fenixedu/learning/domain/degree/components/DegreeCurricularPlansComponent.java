@@ -29,6 +29,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 
 import pt.ist.fenixframework.FenixFramework;
 
@@ -42,20 +43,18 @@ public class DegreeCurricularPlansComponent extends DegreeSiteComponent {
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         Degree degree = degree(page);
 
-        Optional<ExecutionYear> executionYear = getSelectedExecutionYear(globalContext.getRequestContext());
-        if (executionYear.isPresent()) {
-            globalContext.put("degreeCurricularPlan",
-                    degree.getDegreeCurricularPlansForYear(executionYear.get()).stream().findFirst().get());
-            globalContext.put("executionYear", executionYear.get());
-        } else {
-            DegreeCurricularPlan degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
-            if (degreeCurricularPlan != null) {
-                globalContext.put("degreeCurricularPlan", degree.getMostRecentDegreeCurricularPlan());
-                globalContext.put("executionYear", degreeCurricularPlan.getMostRecentExecutionYear());
-            }
-        }
+        Optional<ExecutionYear> yearOptional = getSelectedExecutionYear(globalContext.getRequestContext());
+
+        // qubExtension
+        final DegreeCurricularPlan degreeCurricularPlan =
+                DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, yearOptional);
+        final ExecutionYear year = yearOptional.isPresent() ? yearOptional.get() : degreeCurricularPlan.getLastExecutionYear();
+
+        globalContext.put("degreeCurricularPlan", degreeCurricularPlan);
+        globalContext.put("executionYear", year);
 
         final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
+        // qubExtension
         Collections.sort(years, Comparator.reverseOrder());
         globalContext.put("executionYears", years);
     }
