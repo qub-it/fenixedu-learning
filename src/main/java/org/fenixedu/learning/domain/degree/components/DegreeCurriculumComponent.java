@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -140,7 +141,9 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public LocalizedString getName() {
-            return courseGroup.getNameI18N();
+            // qubExtension, avoid plan name
+            return courseGroup.isRoot() ? new LocalizedString(Locale.getDefault(),
+                    executionInterval.getQualifiedName()) : courseGroup.getNameI18N();
         }
 
         public Stream<String> getRules() {
@@ -203,7 +206,8 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public boolean isOptional() {
-            return curricularCourse.isOptional();
+            // qubExtension, report optional also due to course group
+            return curricularCourse.isOptional() || context.getParentCourseGroup().isOptionalCourseGroup();
         }
 
         public LocalizedString getName() {
@@ -269,6 +273,13 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
         @Override
         public int compareTo(CurricularCourseWrap o) {
+            //qubExtension, show optionals as last
+            if (isOptional() && !o.isOptional()) {
+                return 1;
+            } else if (!isOptional() && o.isOptional()) {
+                return -1;
+            }
+
             return getName().compareTo(o.getName());
         }
     }
