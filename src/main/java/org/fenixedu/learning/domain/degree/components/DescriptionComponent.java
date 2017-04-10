@@ -77,23 +77,34 @@ public class DescriptionComponent extends DegreeSiteComponent {
             }
 
             return executionDegree.getExecutionYear();
+
         } else {
-            final ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
 
-            List<ExecutionYear> whenDegreeIsExecuted = degree.getDegreeCurricularPlansExecutionYears();
-            if (whenDegreeIsExecuted.isEmpty()) {
-                return currentExecutionYear;
+            // qubExtension, select latest (provided that it is clear on the Html)
+            final DegreeInfo latest =
+                    degree.getDegreeInfosSet().stream().max(DegreeInfo.COMPARATOR_BY_EXECUTION_YEAR).orElse(null);
+            if (latest != null) {
+                return latest.getExecutionYear();
+
             } else {
-                final ExecutionYear firstExecutionYear = whenDegreeIsExecuted.iterator().next();
-                final ExecutionYear lastExecutionYear = whenDegreeIsExecuted.get(whenDegreeIsExecuted.size() - 1);
 
-                if (whenDegreeIsExecuted.contains(currentExecutionYear)) {
+                final ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+
+                List<ExecutionYear> whenDegreeIsExecuted = degree.getDegreeCurricularPlansExecutionYears();
+                if (whenDegreeIsExecuted.isEmpty()) {
                     return currentExecutionYear;
                 } else {
-                    if (currentExecutionYear.isBefore(firstExecutionYear)) {
-                        return firstExecutionYear;
+                    final ExecutionYear firstExecutionYear = whenDegreeIsExecuted.iterator().next();
+                    final ExecutionYear lastExecutionYear = whenDegreeIsExecuted.get(whenDegreeIsExecuted.size() - 1);
+
+                    if (whenDegreeIsExecuted.contains(currentExecutionYear)) {
+                        return currentExecutionYear;
                     } else {
-                        return lastExecutionYear;
+                        if (currentExecutionYear.isBefore(firstExecutionYear)) {
+                            return firstExecutionYear;
+                        } else {
+                            return lastExecutionYear;
+                        }
                     }
                 }
             }

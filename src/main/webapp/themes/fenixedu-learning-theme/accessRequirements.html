@@ -7,6 +7,9 @@
 {% endmacro %}
 
 {% block content %}
+
+    <h3>{{ year }}</h3>
+
 	<!-- COURSE NAME -->
 	<h1>{{ degree.phdProgram is empty ? degree.presentationName : degree.phdProgram.presentationName }}</h1>
 
