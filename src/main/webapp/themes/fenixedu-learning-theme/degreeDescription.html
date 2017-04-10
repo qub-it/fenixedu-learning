@@ -41,6 +41,8 @@
 
 {% block content %}
 
+<h3>{{ year }}</h3>
+
 {% if degreeInfo is null %}
 	<p><em> {{ i18n('resources.ApplicationResources','error.public.DegreeInfoNotPresent') }}</em></p>
 {% else %}
@@ -141,7 +143,6 @@
 <!-- COORDINATORS -->
 {% if coordinators is not empty %}
 	<h3 style="font-weight:300; margin-top:45px;">{{ i18n('resources.PublicDegreeInformation','public.degree.information.label.coordinators') }}</h3>
-  <div style="font-size:15px; color:#888; font-weight:300; margin-bottom:30px;">{{ year }}</div>
 	{% for coordinator in coordinators %}
 		{{ personCard(coordinator.person) }}
 	{% endfor %}
