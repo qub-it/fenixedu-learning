@@ -43,6 +43,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
+import org.fenixedu.academic.domain.degreeStructure.BranchCourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.RegimeType;
@@ -174,7 +175,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public String getInitialStyle() {
-            return courseGroup.getIsOptional() == Boolean.TRUE ? "display:none" : "";
+            return courseGroup.getIsOptional() || courseGroup instanceof BranchCourseGroup ? "display:none" : "";
         }
 
         private String getInitialImage() {
