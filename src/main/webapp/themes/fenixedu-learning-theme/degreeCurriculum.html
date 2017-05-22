@@ -115,14 +115,14 @@
 
     <ul class="nav nav-tabs" role="tablist">
         <li class="active">
-        	<a href="#bySemesters" role="tab" data-toggle="tab">
-        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byYearAndSemester') }}        		
+        	<a href="#byGroups" role="tab" data-toggle="tab">
+        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byGroups') }}
         	</a>
     	</li>
 
         <li>
-        	<a href="#byGroups" role="tab" data-toggle="tab">
-        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byGroups') }}
+        	<a href="#bySemesters" role="tab" data-toggle="tab">
+        		{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.byYearAndSemester') }}        		
         	</a>
     	</li>
     </ul>
@@ -130,7 +130,7 @@
 	<br />
 
     <div class="tab-content">
-		<div class="tab-pane fade in active" id="bySemesters">
+		<div class="tab-pane fade in" id="bySemesters">
             <div>
                 <div class="dropdown pull-right">
                     <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -146,7 +146,7 @@
             </div>
 			{{viewCurricularCoursesBySemester(coursesByCurricularSemester)}}
 		</div>
-        <div class="tab-pane fade in" id="byGroups">
+        <div class="tab-pane fade in active" id="byGroups">
             <div>
                 <button class="btn btn-sm btn-default pull-right" type="button" id="rules_button">
                     {{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.showRules') }}
