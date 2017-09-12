@@ -43,6 +43,8 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
+import org.fenixedu.academic.domain.curricularRules.CurricularRule;
+import org.fenixedu.academic.domain.curricularRules.EnrolmentToBeApprovedByCoordinator;
 import org.fenixedu.academic.domain.degreeStructure.BranchCourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
@@ -155,7 +157,10 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
         public Stream<CurricularCourseWrap> getCurricularCourses() {
             return courseGroup.getSortedOpenChildContextsWithCurricularCourses(executionInterval).stream()
-                    .map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl));
+                    .map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl))
+
+                    // qubExtension, don't show courses with some rules
+                    .filter(course -> course.getRulesObjects().noneMatch(EnrolmentToBeApprovedByCoordinator.class::isInstance));
         }
 
         public Stream<CourseGroupWrap> getCourseGroups() {
@@ -265,8 +270,13 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public Stream<String> getRules() {
+            return getRulesObjects().map(rule -> CurricularRuleLabelFormatter.getLabel(rule));
+        }
+
+        // qubExtension
+        private Stream<CurricularRule> getRulesObjects() {
             return curricularCourse.getVisibleCurricularRules(executionInterval).stream()
-                    .filter(rule -> rule.appliesToContext(context)).map(rule -> CurricularRuleLabelFormatter.getLabel(rule));
+                    .filter(rule -> rule.appliesToContext(context));
         }
 
         public CurricularPeriod getCurricularPeriod() {
