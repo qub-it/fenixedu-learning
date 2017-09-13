@@ -1,5 +1,6 @@
 package org.fenixedu.learning.domain;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -7,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +23,8 @@ abstract public class DegreeCurricularPlanServices {
             final Optional<ExecutionYear> executionYearOptional) {
 
         // legidio, HACK until a better effort comes
-        return getDegreeCurricularPlansForYear(degree, executionYearOptional).stream().max(DomainObjectUtil.COMPARATOR_BY_ID)
-                .orElse(null);
+        return getDegreeCurricularPlansForYear(degree, executionYearOptional).stream()
+                .max(Comparator.comparing(DegreeCurricularPlan::getInitialDateYearMonthDay)).orElse(null);
     }
 
     static public Set<DegreeCurricularPlan> getDegreeCurricularPlansForYear(final Degree degree,
@@ -38,9 +38,8 @@ abstract public class DegreeCurricularPlanServices {
 
             if (year != null) {
                 final List<DegreeCurricularPlan> dcps = degree.getDegreeCurricularPlansForYear(year);
-                dcps.stream()
-                        .filter(plan -> plan.isApproved() && plan.isActive()
-                                && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty())
+                dcps.stream().filter(
+                        plan -> plan.isApproved() && plan.isActive() && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty())
                         .collect(Collectors.toCollection(() -> result));
             }
         }
