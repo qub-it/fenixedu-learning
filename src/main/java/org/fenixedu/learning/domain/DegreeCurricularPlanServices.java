@@ -1,9 +1,9 @@
 package org.fenixedu.learning.domain;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
@@ -22,7 +22,6 @@ abstract public class DegreeCurricularPlanServices {
     static public DegreeCurricularPlan getMostRecentDegreeCurricularPlan(final Degree degree,
             final Optional<ExecutionYear> executionYearOptional) {
 
-        // legidio, HACK until a better effort comes
         return getDegreeCurricularPlansForYear(degree, executionYearOptional).stream()
                 .max(Comparator.comparing(DegreeCurricularPlan::getInitialDateYearMonthDay)).orElse(null);
     }
@@ -33,17 +32,35 @@ abstract public class DegreeCurricularPlanServices {
         final Set<DegreeCurricularPlan> result = Sets.newHashSet();
 
         if (degree != null) {
-            final ExecutionYear year = yearOptional.isPresent() ? yearOptional.get() : degree
-                    .getDegreeCurricularPlansExecutionYears().stream().max(ExecutionYear::compareTo).orElse(null);
+            final ExecutionYear year = yearOptional.isPresent() ? yearOptional
+                    .get() : getDegreeCurricularPlansExecutionYears(degree).stream().max(ExecutionYear::compareTo).orElse(null);
 
             if (year != null) {
-                final List<DegreeCurricularPlan> dcps = degree.getDegreeCurricularPlansForYear(year);
-                dcps.stream().filter(
-                        plan -> plan.isApproved() && plan.isActive() && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty())
+                degree.getDegreeCurricularPlansSet().stream().filter(predicateDCP(year))
                         .collect(Collectors.toCollection(() -> result));
             }
         }
 
         return result;
     }
+
+    static private Predicate<DegreeCurricularPlan> predicateDCP(final ExecutionYear year) {
+        return plan -> {
+            return plan.isApproved() && plan.isActive() && plan.hasExecutionDegreeFor(year)
+                    && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty();
+        };
+    }
+
+    static public Set<ExecutionYear> getDegreeCurricularPlansExecutionYears(final Degree degree) {
+        final Set<ExecutionYear> result = Sets.newHashSet();
+
+        if (degree != null) {
+            return degree.getDegreeCurricularPlansSet().stream().flatMap(plan -> plan.getExecutionDegreesSet().stream())
+                    .filter(ed -> predicateDCP(ed.getExecutionYear()).test(ed.getDegreeCurricularPlan()))
+                    .map(ed -> ed.getExecutionYear()).collect(Collectors.toCollection(() -> result));
+        }
+
+        return result;
+    }
+
 }
