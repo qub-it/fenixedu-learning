@@ -132,6 +132,8 @@
     <div class="tab-content">
 		<div class="tab-pane fade in" id="bySemesters">
             <div>
+
+            	<!-- qubExtension, duplicate code in bySemesters/byGroups -->
                 <div class="dropdown pull-right">
                     <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                         {{ selectedYear.year }} 
@@ -143,6 +145,22 @@
                         {% endfor %}
                     </ul>
                 </div>
+                
+                <!-- qubExtension, duplicate code in bySemesters/byGroups -->
+                {% if plans.size > 1 %}
+	                <div class="dropdown pull-right">
+	                    <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+	                        {{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.since') + " " + selectedPlan.initialDateYearMonthDay.year }} 
+	                        <span class="caret"></span>
+	                    </button>
+	                    <ul class="dropdown-menu" role="menu">
+	                        {% for plan in plans %}
+	                            <li><a href="?plan={{ plan.externalId }}">{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.since') + " " + plan.initialDateYearMonthDay.year }}</a></li>
+	                        {% endfor %}
+	                    </ul>
+	                </div>
+                {% endif %}
+                
             </div>
 			{{viewCurricularCoursesBySemester(coursesByCurricularSemester)}}
 		</div>
@@ -151,6 +169,8 @@
                 <button class="btn btn-sm btn-default pull-right" type="button" id="rules_button">
                     {{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.showRules') }}
                 </button>
+                
+                <!-- qubExtension, duplicate code in bySemesters/byGroups -->
                 <div class="dropdown pull-right">
                     <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                         {{ selectedYear.year }} 
@@ -162,6 +182,22 @@
                         {% endfor %}
                     </ul>
                 </div>
+                
+                <!-- qubExtension, duplicate code in bySemesters/byGroups -->
+                {% if plans.size > 1 %}
+	                <div class="dropdown pull-right">
+	                    <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+	                        {{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.since') + " " + selectedPlan.initialDateYearMonthDay.year }} 
+	                        <span class="caret"></span>
+	                    </button>
+	                    <ul class="dropdown-menu" role="menu">
+	                        {% for plan in plans %}
+	                            <li><a href="?plan={{ plan.externalId }}">{{ i18n('resources.FenixEduLearningResources', 'label.degreeCurricularPlan.since') + " " + plan.initialDateYearMonthDay.year }}</a></li>
+	                        {% endfor %}
+	                    </ul>
+	                </div>
+                {% endif %}
+
             </div>
 			{{ viewCourseGroups(courseGroups) }}
 		</div>
