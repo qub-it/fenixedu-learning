@@ -27,15 +27,13 @@ import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularCourse;
@@ -75,24 +73,30 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         Degree degree = degree(page);
         site = page.getSite();
         String pageUrl = pageForComponent(site, CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
+
         ExecutionYear selectedYear = selectedYear((String) globalContext.get("year"), degree);
-        globalContext.put("courseGroups", courseGroups(degree, selectedYear, pageUrl));
-        globalContext.put("allCurricularCourses",
-                allCurricularCourses(courseGroups(degree, selectedYear, pageUrl).collect(toSet())));
-
-        globalContext.put("coursesByCurricularSemester", coursesByCurricularSemester(degree, selectedYear, pageUrl));
-
-        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
         // qubExtension
-        Collections.sort(years, Comparator.reverseOrder());
-        globalContext.put("years", years);
+        final DegreeCurricularPlan plan = selectedPlan((String) globalContext.get("plan"), degree, selectedYear);
 
+        globalContext.put("courseGroups", courseGroups(plan, selectedYear, pageUrl));
+        globalContext.put("allCurricularCourses",
+                allCurricularCourses(courseGroups(plan, selectedYear, pageUrl).collect(toSet())));
+        globalContext.put("coursesByCurricularSemester", coursesByCurricularSemester(plan, selectedYear, pageUrl));
+
+        // qubExtension
+        globalContext.put("years", DegreeCurricularPlanServices.getDegreeCurricularPlansExecutionYears(degree).stream()
+                .sorted(Comparator.reverseOrder()).collect(Collectors.toList()));
         globalContext.put("selectedYear", selectedYear);
+
+        // qubExtension
+        globalContext.put("plans", DegreeCurricularPlanServices.getDegreeCurricularPlansForYear(degree, Optional.of(selectedYear))
+                .stream().sorted(DegreeCurricularPlan.COMPARATOR_BY_PRESENTATION_NAME.reversed()).collect(Collectors.toList()));
+        globalContext.put("selectedPlan", plan);
     }
 
-    SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(Degree degree, ExecutionYear year,
-            String pageUrl) {
-        return allCurricularCourses(courseGroups(degree, year, pageUrl).collect(toSet()))
+    SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(final DegreeCurricularPlan plan,
+            ExecutionYear year, String pageUrl) {
+        return allCurricularCourses(courseGroups(plan, year, pageUrl).collect(toSet()))
                 .collect(groupingBy(CurricularCourseWrap::getCurricularPeriod, TreeMap::new, toCollection(TreeSet::new)));
     }
 
@@ -102,24 +106,48 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         return Stream.concat(fathers.stream().flatMap(CourseGroupWrap::getCurricularCourses), childrenCall);
     }
 
-    Stream<CourseGroupWrap> courseGroups(Degree degree, ExecutionYear year, String pageUrl) {
-        return DegreeCurricularPlanServices.getDegreeCurricularPlansForYear(degree, Optional.of(year)).stream()
-                .map(plan -> new CourseGroupWrap(null, plan.getRoot(), year, pageUrl));
+    Stream<CourseGroupWrap> courseGroups(final DegreeCurricularPlan plan, ExecutionYear year, String pageUrl) {
+        if (plan == null) {
+            return Stream.empty();
+        }
+
+        final CourseGroupWrap root = new CourseGroupWrap(null, plan.getRoot(), year, pageUrl);
+        return root.getCourseGroups();
     }
 
     ExecutionYear selectedYear(String year, Degree degree) {
-        ExecutionYear result = readCurrentExecutionYear();
+        ExecutionYear result = null;
 
         if (!Strings.isNullOrEmpty(year)) {
             result = getDomainObject(year);
+        }
 
-        } else {
+        if (result == null) {
+
             final DegreeCurricularPlan dcp =
                     DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.empty());
-
             if (dcp != null) {
                 result = dcp.getLastExecutionYear();
             }
+        }
+
+        if (result == null) {
+            result = readCurrentExecutionYear();
+        }
+
+        return result;
+    }
+
+    // qubExtension
+    DegreeCurricularPlan selectedPlan(final String oid, final Degree degree, final ExecutionYear year) {
+        DegreeCurricularPlan result = null;
+
+        if (!Strings.isNullOrEmpty(oid)) {
+            result = getDomainObject(oid);
+        }
+
+        if (result == null) {
+            result = DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(year));
         }
 
         return result;
@@ -144,9 +172,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public LocalizedString getName() {
-            // qubExtension, avoid plan name
-            return courseGroup.isRoot() ? new LocalizedString(Locale.getDefault(),
-                    executionInterval.getQualifiedName()) : courseGroup.getNameI18N();
+            return courseGroup.getNameI18N();
         }
 
         public Stream<String> getRules() {
@@ -168,10 +194,12 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
                             pageUrl));
         }
 
+        // qubExtension
         public String getExternalId() {
             return courseGroup.getExternalId();
         }
 
+        // qubExtension
         public String buildImage() {
             final String oid = getExternalId();
             return String.format(
@@ -179,10 +207,12 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
                     getInitialImage(), oid, oid);
         }
 
+        // qubExtension
         public String getInitialStyle() {
             return courseGroup.getIsOptional() || courseGroup instanceof BranchCourseGroup ? "display:none" : "";
         }
 
+        // qubExtension
         private String getInitialImage() {
             final String result;
             if (Strings.isNullOrEmpty(getInitialStyle())) {
@@ -195,7 +225,6 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
             return site.getStaticDirectory() + "/images/" + result;
         }
-
     }
 
     private class CurricularCourseWrap extends Wrap implements Comparable<CurricularCourseWrap> {
