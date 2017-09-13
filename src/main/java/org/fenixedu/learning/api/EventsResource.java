@@ -30,6 +30,7 @@ import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.cms.domain.Site;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 import org.fenixedu.learning.domain.ScheduleEventBean;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
@@ -58,13 +59,13 @@ public class EventsResource {
         Set<ScheduleEventBean> events = new HashSet<>();
 
         if (interval.contains(projectStart)) {
-            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(), project
-                    .getPresentationName(), projectStart, projectStart.plusHours(1), null, executionCourse.getSiteUrl(),
+            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(),
+                    project.getPresentationName(), projectStart, projectStart.plusHours(1), null, executionCourse.getSiteUrl(),
                     colorForType(project.getEvaluationType()), null, null));
         }
         if (interval.contains(projectEnd)) {
-            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(), project
-                    .getPresentationName(), projectEnd.minusHours(1), projectEnd, null, executionCourse.getSiteUrl(),
+            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(),
+                    project.getPresentationName(), projectEnd.minusHours(1), projectEnd, null, executionCourse.getSiteUrl(),
                     colorForType(project.getEvaluationType()), null, null));
         }
 
@@ -80,9 +81,8 @@ public class EventsResource {
     @Produces("application/json; charset=utf-8")
     public String executionCourseEvents(@PathParam("course") ExecutionCourse course, @QueryParam("start") String start,
             @QueryParam("end") String end) {
-        return toJson(
-                hasPermissionToViewSchedule(course) ? ScheduleEventBean.forExecutionCourse(course, getInterval(start, end)) : Collections
-                        .emptySet()).toString();
+        return toJson(hasPermissionToViewSchedule(course) ? ScheduleEventBean.forExecutionCourse(course,
+                getInterval(start, end)) : Collections.emptySet()).toString();
     }
 
     @GET
@@ -123,9 +123,8 @@ public class EventsResource {
     @Path("/degree/evaluations/{degree}/nearestEvent")
     @Produces("application/json; charset=utf-8")
     public String nearestEvaluationEvent(@PathParam("degree") Degree degree) {
-        Optional<Interval> interval =
-                degree.getDegreeCurricularPlansExecutionYears().stream().sorted(COMPARATOR_BY_YEAR.reversed())
-                        .map(year -> year.getAcademicInterval().toInterval()).findFirst();
+        Optional<Interval> interval = DegreeCurricularPlanServices.getDegreeCurricularPlansExecutionYears(degree).stream()
+                .sorted(COMPARATOR_BY_YEAR.reversed()).map(year -> year.getAcademicInterval().toInterval()).findFirst();
         LocalDate date = interval.isPresent() ? nearestEventDate(allPublicEvaluations(degree, interval.get())) : LocalDate.now();
         return toJson(date).toString();
     }
@@ -205,13 +204,10 @@ public class EventsResource {
 
     private Collection<ScheduleEventBean> writtenEvaluations(Degree degree, Interval interval) {
         Set<ScheduleEventBean> events = new HashSet<>();
-        allExecutionCourses(degree).forEach(
-                executionCourse -> executionCourse
-                        .getAssociatedWrittenEvaluations()
-                        .stream()
-                        .filter(writtenEval -> writtenEval.getBeginningDateTime() != null
-                                && interval.contains(writtenEval.getBeginningDateTime()))
-                        .forEach(writtenEval -> events.add(createEventBean(executionCourse, writtenEval))));
+        allExecutionCourses(degree).forEach(executionCourse -> executionCourse.getAssociatedWrittenEvaluations().stream()
+                .filter(writtenEval -> writtenEval.getBeginningDateTime() != null
+                        && interval.contains(writtenEval.getBeginningDateTime()))
+                .forEach(writtenEval -> events.add(createEventBean(executionCourse, writtenEval))));
         return events;
     }
 

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -53,10 +54,9 @@ public class DegreeCurricularPlansComponent extends DegreeSiteComponent {
         globalContext.put("degreeCurricularPlan", degreeCurricularPlan);
         globalContext.put("executionYear", year);
 
-        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
         // qubExtension
-        Collections.sort(years, Comparator.reverseOrder());
-        globalContext.put("executionYears", years);
+        globalContext.put("executionYears", DegreeCurricularPlanServices.getDegreeCurricularPlansExecutionYears(degree).stream()
+                .sorted(Comparator.reverseOrder()).collect(Collectors.toList()));
     }
 
     private Optional<ExecutionYear> getSelectedExecutionYear(String[] requestContext) {

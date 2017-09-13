@@ -19,7 +19,7 @@
 package org.fenixedu.learning.domain.degree.components;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
@@ -30,6 +30,7 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
+import org.fenixedu.learning.domain.DegreeCurricularPlanServices;
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -88,24 +89,17 @@ public class DescriptionComponent extends DegreeSiteComponent {
 
             } else {
 
-                final ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+                final ExecutionYear current = ExecutionYear.readCurrentExecutionYear();
+                final Set<ExecutionYear> years = DegreeCurricularPlanServices.getDegreeCurricularPlansExecutionYears(degree);
 
-                List<ExecutionYear> whenDegreeIsExecuted = degree.getDegreeCurricularPlansExecutionYears();
-                if (whenDegreeIsExecuted.isEmpty()) {
-                    return currentExecutionYear;
+                // qubExtension, refactored
+                if (years.isEmpty() || years.contains(current)) {
+                    return current;
+
                 } else {
-                    final ExecutionYear firstExecutionYear = whenDegreeIsExecuted.iterator().next();
-                    final ExecutionYear lastExecutionYear = whenDegreeIsExecuted.get(whenDegreeIsExecuted.size() - 1);
-
-                    if (whenDegreeIsExecuted.contains(currentExecutionYear)) {
-                        return currentExecutionYear;
-                    } else {
-                        if (currentExecutionYear.isBefore(firstExecutionYear)) {
-                            return firstExecutionYear;
-                        } else {
-                            return lastExecutionYear;
-                        }
-                    }
+                    final ExecutionYear first = years.stream().min(ExecutionYear::compareTo).orElse(null);
+                    final ExecutionYear last = years.stream().max(ExecutionYear::compareTo).orElse(null);
+                    return current.isBefore(first) ? first : last;
                 }
             }
         }

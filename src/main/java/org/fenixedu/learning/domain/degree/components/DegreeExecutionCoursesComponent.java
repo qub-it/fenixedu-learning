@@ -20,21 +20,19 @@ package org.fenixedu.learning.domain.degree.components;
 
 import static org.fenixedu.academic.domain.ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR;
 
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
@@ -57,10 +55,9 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
         Degree degree = degree(page);
         globalContext.put("executionCoursesBySemesterAndCurricularYear", executionCourses(degree));
 
-        final List<ExecutionYear> years = degree.getDegreeCurricularPlansExecutionYears();
         // qubExtension
-        Collections.sort(years, Comparator.reverseOrder());
-        globalContext.put("executionYears", years);
+        globalContext.put("executionYears", DegreeCurricularPlanServices.getDegreeCurricularPlansExecutionYears(degree).stream()
+                .sorted(Comparator.reverseOrder()).collect(Collectors.toList()));
     }
 
     public SortedMap<ExecutionSemester, SortedMap<Integer, SortedSet<ExecutionCourse>>> executionCourses(final Degree degree) {
