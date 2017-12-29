@@ -3,7 +3,7 @@ package org.fenixedu.learning.task;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
-import org.fenixedu.learning.domain.degree.DegreeSite;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.learning.domain.degree.DegreeSiteListener;
 
 public class LoadAllDegreeSites extends CustomTask {
@@ -16,7 +16,7 @@ public class LoadAllDegreeSites extends CustomTask {
              * was raised, and therefore no LMS structures were created.
              */
             if (degree.getSite() == null) {
-                DegreeSite s = DegreeSiteListener.create(degree);
+                Site s = DegreeSiteListener.create(degree);
                 /*This lines are now inside the constructor*/
                 //s.setFolder(folderForPath(PortalConfiguration.getInstance().getMenu(), "degrees"));
                 //s.setSlug(on("-").join(degree.getSigla(), degree.getExternalId()));
