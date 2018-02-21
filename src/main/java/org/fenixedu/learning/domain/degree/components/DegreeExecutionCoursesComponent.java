@@ -64,15 +64,14 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
         TreeMap<ExecutionSemester, SortedMap<Integer, SortedSet<ExecutionCourse>>> result =
                 Maps.newTreeMap(COMPARATOR_BY_SEMESTER_AND_YEAR);
 
-        ExecutionSemester currentExecutionPeriod = ExecutionSemester.readActualExecutionSemester();
-        ExecutionSemester previousExecutionPeriod = currentExecutionPeriod.getPreviousExecutionPeriod();
-        ExecutionSemester nextExecutionSemester = currentExecutionPeriod.getNextExecutionPeriod();
-        boolean hasNextExecutionSemester =
-                nextExecutionSemester != null && nextExecutionSemester.getState().equals(PeriodState.OPEN);
-        ExecutionSemester selectedExecutionPeriod = hasNextExecutionSemester ? nextExecutionSemester : previousExecutionPeriod;
+        final ExecutionSemester current = ExecutionSemester.readActualExecutionSemester();
+        final ExecutionSemester previous = current.getPreviousExecutionPeriod();
+        final ExecutionSemester next = current.getNextExecutionPeriod();
+        final boolean hasNext = next.getExecutionYear().isCurrent() && next != null && next.getState().equals(PeriodState.OPEN);
+        final ExecutionSemester selected = hasNext ? next : previous;
 
-        result.put(selectedExecutionPeriod, executionCourses(degree, selectedExecutionPeriod));
-        result.put(currentExecutionPeriod, executionCourses(degree, currentExecutionPeriod));
+        result.put(selected, executionCourses(degree, selected));
+        result.put(current, executionCourses(degree, current));
         return result;
     }
 
