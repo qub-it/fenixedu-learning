@@ -29,6 +29,8 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.academic.domain.ProfessorshipPermissions;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
@@ -51,7 +53,6 @@ import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.Component;
 import org.fenixedu.cms.domain.component.StaticPost;
 import org.fenixedu.cms.routing.CMSRenderer;
-import org.fenixedu.cms.ui.AdminThemes;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.learning.domain.degree.DegreeRequestHandler;
@@ -60,11 +61,11 @@ import org.fenixedu.learning.domain.executionCourse.ExecutionCourseListener;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseRequestHandler;
 import org.fenixedu.learning.domain.executionCourse.SummaryListener;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
@@ -75,8 +76,8 @@ public class FenixEduLearningContextListener implements ServletContextListener {
     private final static Logger logger = LoggerFactory.getLogger(FenixEduLearningContextListener.class);
 
     @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        Signal.register(Summary.CREATE_SIGNAL, (DomainObjectEvent<Summary> event) -> {
+    public void contextInitialized(final ServletContextEvent sce) {
+        Signal.register(Summary.CREATE_SIGNAL, (final DomainObjectEvent<Summary> event) -> {
             Summary summary = event.getInstance();
             SummaryListener.updatePost(new Post(summary.getExecutionCourse().getSite()), summary);
         });
@@ -87,21 +88,22 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 post.delete();
             }
         });
-        Signal.register(Summary.EDIT_SIGNAL, (DomainObjectEvent<Summary> event) -> {
+        Signal.register(Summary.EDIT_SIGNAL, (final DomainObjectEvent<Summary> event) -> {
             SummaryListener.updatePost(event.getInstance().getPost(), event.getInstance());
         });
-        Signal.register(ExecutionCourse.CREATED_SIGNAL, (DomainObjectEvent<ExecutionCourse> event) -> {
+        Signal.register(ExecutionCourse.CREATED_SIGNAL, (final DomainObjectEvent<ExecutionCourse> event) -> {
             ExecutionCourseListener.create(event.getInstance());
         });
 
-        Signal.register(ExecutionCourse.ACRONYM_CHANGED_SIGNAL, (DomainObjectEvent<ExecutionCourse> event) -> {
+        Signal.register(ExecutionCourse.ACRONYM_CHANGED_SIGNAL, (final DomainObjectEvent<ExecutionCourse> event) -> {
             ExecutionCourseListener.updateSiteSlug(event.getInstance());
         });
 
-        Signal.register(ProfessorshipPermissions.PROFESSORSHIP_PERMISSIONS_CHANGED, (DomainObjectEvent<ProfessorshipPermissions> event) ->
-                ExecutionCourseListener.updateProfessorship(event.getInstance().getProfessorship(),event.getInstance().getSections()));
+        Signal.register(ProfessorshipPermissions.PROFESSORSHIP_PERMISSIONS_CHANGED,
+                (final DomainObjectEvent<ProfessorshipPermissions> event) -> ExecutionCourseListener
+                        .updateProfessorship(event.getInstance().getProfessorship(), event.getInstance().getSections()));
 
-        Signal.register(Degree.CREATED_SIGNAL, (DomainObjectEvent<Degree> event) -> {
+        Signal.register(Degree.CREATED_SIGNAL, (final DomainObjectEvent<Degree> event) -> {
             DegreeSiteListener.create(event.getInstance());
         });
 
@@ -116,16 +118,16 @@ public class FenixEduLearningContextListener implements ServletContextListener {
             }
         });
 
-        ExecutionCourse.getRelationExecutionCourseProfessorship().addListener(new RelationAdapter<Professorship, ExecutionCourse>() {
-            @Override
-            public void beforeRemove(Professorship o1, ExecutionCourse o2) {
-                if(o1!=null && o1.getExecutionCourse()!=null ) {
-                    ExecutionCourseListener.updateProfessorship(o1, false);
-                }
-                super.beforeRemove(o1,o2);
-            }
-        });
-
+        ExecutionCourse.getRelationExecutionCourseProfessorship()
+                .addListener(new RelationAdapter<Professorship, ExecutionCourse>() {
+                    @Override
+                    public void beforeRemove(final Professorship o1, final ExecutionCourse o2) {
+                        if (o1 != null && o1.getExecutionCourse() != null) {
+                            ExecutionCourseListener.updateProfessorship(o1, false);
+                        }
+                        super.beforeRemove(o1, o2);
+                    }
+                });
 
         FenixFramework.getDomainModel().registerDeletionListener(Degree.class, (degree) -> {
             if (degree.getSite() != null) {
@@ -134,35 +136,34 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 site.delete();
             }
         });
-    
+
         FenixFramework.getDomainModel().registerDeletionListener(Site.class, (site) -> {
-            if(site.getSystemMenu()!=null){
+            if (site.getSystemMenu() != null) {
                 Menu menu = site.getSystemMenu();
                 site.setSystemMenu(null);
             }
         });
-    
+
         FenixFramework.getDomainModel().registerDeletionListener(Menu.class, (menu) -> {
-            if( menu.getSystemSite() !=null ){
+            if (menu.getSystemSite() != null) {
                 menu.setSystemSite(null);
             }
         });
-        
+
         MergeExecutionCourses.registerMergeHandler(FenixEduLearningContextListener::copyExecutionCoursesSites);
 
         CMSRenderer.addHandler(new ExecutionCourseRequestHandler());
         CMSRenderer.addHandler(new DegreeRequestHandler());
 
     }
-    
-    private static void handleSiteEdition(DomainObjectEvent<Site>  site) {
-        if(site.getInstance().getExecutionCourse()!=null){
+
+    private static void handleSiteEdition(final DomainObjectEvent<Site> site) {
+        if (site.getInstance().getExecutionCourse() != null) {
             site.getInstance().getExecutionCourse().setSiteUrl(site.getInstance().getFullUrl());
         }
     }
-    
-    
-    private static void copyExecutionCoursesSites(ExecutionCourse from, ExecutionCourse to) {
+
+    private static void copyExecutionCoursesSites(final ExecutionCourse from, final ExecutionCourse to) {
         if (from.getSite() != null) {
             if (to.getSite() != null) {
                 Menu newMenu = to.getSite().getMenusSet().stream().findAny().get();
@@ -170,7 +171,8 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 LocalizedString newPageName = new LocalizedString().with(Locale.getDefault(),
                         from.getName() + "(" + from.getDegreePresentationString() + ")");
 
-                MenuItem emptyPageParent = PagesAdminService.create(to.getSite(), null, newPageName, new LocalizedString(), new LocalizedString()).get();
+                MenuItem emptyPageParent = PagesAdminService
+                        .create(to.getSite(), null, newPageName, new LocalizedString(), new LocalizedString()).get();
 
                 emptyPageParent.getPage().setPublished(false);
                 emptyPageParent.setTop(newMenu);
@@ -186,7 +188,7 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         }
     }
 
-    private static void handleMarksPublishment(MarkPublishingBean bean) {
+    private static void handleMarksPublishment(final MarkPublishingBean bean) {
         String publishmentMessage = bean.getEvaluation().getPublishmentMessage();
         if (publishmentMessage != null && !Strings.isNullOrEmpty(publishmentMessage.trim())
                 && bean.getCourse().getSite() != null) {
@@ -202,7 +204,7 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         }
     }
 
-    private static void handleThesisProposalApproval(DomainObjectEvent<Thesis> event) {
+    private static void handleThesisProposalApproval(final DomainObjectEvent<Thesis> event) {
         Thesis thesis = event.getInstance();
         if (thesis.getProposedDiscussed() == null || thesis.getDegree().getSite() == null) {
             return;
@@ -230,16 +232,16 @@ public class FenixEduLearningContextListener implements ServletContextListener {
 
     }
 
-    private static int hasPlace(Thesis thesis) {
+    private static int hasPlace(final Thesis thesis) {
         String place = thesis.getProposedPlace();
         return place == null || place.trim().length() == 0 ? 0 : 1;
     }
 
-    private static String getTime(DateTime dateTime) {
+    private static String getTime(final DateTime dateTime) {
         return String.format(I18N.getLocale(), "%tR", dateTime.toDate());
     }
 
-    private static int hasTime(DateTime proposedDiscussed) {
+    private static int hasTime(final DateTime proposedDiscussed) {
         if (proposedDiscussed.getHourOfDay() == 0 && proposedDiscussed.getMinuteOfHour() == 0) {
             return 0;
         } else {
@@ -247,24 +249,26 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         }
     }
 
-    private static String getDate(DateTime dateTime) {
+    private static String getDate(final DateTime dateTime) {
         return String.format(I18N.getLocale(), "%1$td de %1$tB de %1$tY", dateTime.toDate());
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(final ServletContextEvent event) {
 
     }
 
     private static class PagesAdminService {
 
         @Atomic(mode = Atomic.TxMode.WRITE)
-        protected static Optional<MenuItem> create(Site site, MenuItem parent, LocalizedString name, LocalizedString body, LocalizedString excerpt) {
+        protected static Optional<MenuItem> create(final Site site, final MenuItem parent, final LocalizedString name,
+                final LocalizedString body, final LocalizedString excerpt) {
             Menu menu = site.getMenusSet().stream().findFirst().orElse(null);
             Page page = Page.create(site, menu, parent, Post.sanitize(name), true, "view", Authenticate.getUser());
             Category category =
                     site.getOrCreateCategoryForSlug("content", new LocalizedString().with(I18N.getLocale(), "Content"));
-            Post post = Post.create(site, page, Post.sanitize(name), Post.sanitize(body), Post.sanitize(excerpt), category, true, Authenticate.getUser());
+            Post post = Post.create(site, page, Post.sanitize(name), Post.sanitize(body), Post.sanitize(excerpt), category, true,
+                    Authenticate.getUser());
             page.addComponents(new StaticPost(post));
             MenuItem menuItem = page.getMenuItemsSet().stream().findFirst().get();
             if (parent != null) {
@@ -275,8 +279,8 @@ public class FenixEduLearningContextListener implements ServletContextListener {
             return Optional.of(menuItem);
         }
 
-        protected static void copyStaticPage(MenuItem oldMenuItem, Site newSite, Menu newMenu,
-                MenuItem newParent) {
+        protected static void copyStaticPage(final MenuItem oldMenuItem, final Site newSite, final Menu newMenu,
+                final MenuItem newParent) {
             if (oldMenuItem.getPage() != null) {
                 Page oldPage = oldMenuItem.getPage();
                 staticPost(oldPage).ifPresent(oldPost -> {
@@ -305,10 +309,10 @@ public class FenixEduLearningContextListener implements ServletContextListener {
             }
         }
 
-        private static Post clonePost(Post oldPost, Site newSite) {
+        private static Post clonePost(final Post oldPost, final Site newSite) {
             Post newPost = new Post(newSite);
             newPost.setName(oldPost.getName());
-            newPost.setBodyAndExcerpt(oldPost.getBody(),oldPost.getExcerpt() );
+            newPost.setBodyAndExcerpt(oldPost.getBody(), oldPost.getExcerpt());
             newPost.setCreationDate(new DateTime());
             newPost.setCreatedBy(Authenticate.getUser());
             newPost.setActive(oldPost.getActive());
@@ -318,22 +322,21 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 newPost.addCategories(newCategory);
             }
 
-            oldPost.getFilesSet().stream().map(postFile -> postFile.getFiles())
-                    .forEach(file -> {
-                        try {
-                            new PostFile(newPost,
-                                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getStream(), Group.anyone()),
-                                    false, file.getPostFile().getIndex());
-                        } catch (IOException e) {
-                          logger.warn("could not clone file " + file.getDisplayName()
-                                  + " from post "+ newPost.getSlug() + " on site " +  newPost.getSite().getSlug());
-                        }
-                    });
+            oldPost.getFilesSet().stream().map(postFile -> postFile.getFiles()).forEach(file -> {
+                try {
+                    new PostFile(newPost,
+                            new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getStream(), Group.anyone()),
+                            false, file.getPostFile().getIndex());
+                } catch (IOException e) {
+                    logger.warn("could not clone file " + file.getDisplayName() + " from post " + newPost.getSlug() + " on site "
+                            + newPost.getSite().getSlug());
+                }
+            });
 
             return newPost;
         }
 
-        private static Optional<Post> staticPost(Page page) {
+        private static Optional<Post> staticPost(final Page page) {
             return page.getComponentsSet().stream().filter(StaticPost.class::isInstance).map(StaticPost.class::cast)
                     .map(StaticPost::getPost).findFirst();
         }

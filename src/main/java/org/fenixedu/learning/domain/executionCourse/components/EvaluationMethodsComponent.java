@@ -31,23 +31,23 @@ import org.fenixedu.commons.i18n.LocalizedString;
 public class EvaluationMethodsComponent extends BaseExecutionCourseComponent {
 
     @Override
-    public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
-        ExecutionCourse executionCourse =page.getSite().getExecutionCourse();
+    public void handle(final Page page, final TemplateContext componentContext, final TemplateContext globalContext) {
+        ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
         LocalizedString evaluationMethod = getEvaluationMethod(executionCourse);
         globalContext.put("evaluationMethod", executionCourse.getEvaluationMethod());
         globalContext.put("evaluationMethodText", evaluationMethod.getContent());
         globalContext.put("evaluationMethodLocalizedString", evaluationMethod);
     }
 
-    private LocalizedString getEvaluationMethod(ExecutionCourse executionCourse) {
+    private LocalizedString getEvaluationMethod(final ExecutionCourse executionCourse) {
         if (executionCourse.getEvaluationMethod() != null) {
             return executionCourse.getEvaluationMethod().getEvaluationElements();
         } else {
 
-            final Set<CompetenceCourse> competences = execution.getCompetenceCourses();
+            final Set<CompetenceCourse> competences = executionCourse.getCompetenceCourses();
             final CompetenceCourse competence = competences.isEmpty() ? null : competences.iterator().next();
             return competence == null ? new LocalizedString() : competence
-                    .getLocalizedEvaluationMethod(execution.getExecutionPeriod());
+                    .getLocalizedEvaluationMethod(executionCourse.getExecutionPeriod());
         }
     }
 
