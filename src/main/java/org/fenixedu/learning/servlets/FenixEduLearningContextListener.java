@@ -100,8 +100,12 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         });
 
         Signal.register(ProfessorshipPermissions.PROFESSORSHIP_PERMISSIONS_CHANGED,
-                (final DomainObjectEvent<ProfessorshipPermissions> event) -> ExecutionCourseListener
-                        .updateProfessorship(event.getInstance().getProfessorship(), event.getInstance().getSections()));
+                (final DomainObjectEvent<ProfessorshipPermissions> event) -> {
+                    if (FenixFramework.isDomainObjectValid(event.getInstance())) {
+                        ExecutionCourseListener.updateProfessorship(event.getInstance().getProfessorship(),
+                                event.getInstance().getSections());
+                    }
+                });
 
         Signal.register(Degree.CREATED_SIGNAL, (final DomainObjectEvent<Degree> event) -> {
             DegreeSiteListener.create(event.getInstance());
