@@ -90,7 +90,7 @@ public class ExecutionCourseSiteBuilder extends ExecutionCourseSiteBuilder_Base 
         Page.create(site, menu, null, SHIFTS_TITLE, true, "shifts", author, forType(ExecutionCourseComponent.class));
         Page.create(site, menu, null, ANNOUNCEMENTS_TITLE, true, "category", author, announcementsComponent);
         Page.create(site, menu, null, SUMMARIES_TITLE, true, "category", author, summariesComponent);
-        Page.create(site, menu, null, MARKS_TITLE, true, "marks", author, forType(MarksComponent.class));
+//        Page.create(site, menu, null, MARKS_TITLE, true, "marks", author, forType(MarksComponent.class));
         Page.create(site, null, null, VIEW_POST_TITLE, true, "view", author, forType(ViewPost.class));
         site.setInitialPage(initialPage);
         
