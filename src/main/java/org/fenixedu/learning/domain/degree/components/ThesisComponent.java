@@ -18,39 +18,20 @@
  */
 package org.fenixedu.learning.domain.degree.components;
 
-import static org.fenixedu.learning.domain.DissertationsUtils.getThesisStateMapping;
-
-import org.fenixedu.academic.domain.thesis.Thesis;
-import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.CMSComponent;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.exceptions.ResourceNotFoundException;
 import org.fenixedu.cms.rendering.TemplateContext;
 
-import pt.ist.fenixframework.FenixFramework;
-
+@Deprecated
 @ComponentType(name = "thesis", description = "Provides information for a specific thesis")
 public class ThesisComponent implements CMSComponent {
 
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
-        String[] ctx = globalContext.getRequestContext();
-        if (ctx.length < 2) {
-            throw new ResourceNotFoundException();
-        }
-        Thesis thesis = FenixFramework.getDomainObject(ctx[1]);
-        if (!FenixFramework.isDomainObjectValid(thesis)) {
-            throw new ResourceNotFoundException();
-        }
-        globalContext.put("thesis", thesis);
-        globalContext.put("states", getThesisStateMapping());
-        globalContext.put("isAccessible", isAccessible(thesis));
-    }
+        throw new ResourceNotFoundException();
 
-    private boolean isAccessible(Thesis thesis) {
-        return thesis != null && thesis.getDissertation() != null
-                && thesis.getDissertation().isAccessible(Authenticate.getUser());
     }
 
 }

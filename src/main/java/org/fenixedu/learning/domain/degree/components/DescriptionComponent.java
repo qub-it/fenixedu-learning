@@ -42,8 +42,7 @@ public class DescriptionComponent extends DegreeSiteComponent {
     public void handle(Page page, TemplateContext componentContext, TemplateContext global) {
         Degree degree = degree(page);
 
-        global.put("degreeName",
-                degree.getPhdProgram() != null ? degree.getPhdProgram().getPresentationName() : degree.getPresentationName());
+        global.put("degreeName", degree.getPresentationName());
 
         ExecutionYear targetExecutionYear = getTargetExecutionYear(global, degree);
         global.put("year", targetExecutionYear.getYear());

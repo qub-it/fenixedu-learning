@@ -19,7 +19,6 @@
 package org.fenixedu.learning.servlets;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -32,11 +31,9 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ProfessorshipPermissions;
 import org.fenixedu.academic.domain.Summary;
-import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.service.services.teacher.PublishMarks;
 import org.fenixedu.academic.service.services.teacher.PublishMarks.MarkPublishingBean;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -112,7 +109,6 @@ public class FenixEduLearningContextListener implements ServletContextListener {
         });
 
         Signal.register(PublishMarks.MARKS_PUBLISHED_SIGNAL, FenixEduLearningContextListener::handleMarksPublishment);
-        Signal.register(Thesis.PROPOSAL_APPROVED_SIGNAL, FenixEduLearningContextListener::handleThesisProposalApproval);
         Signal.register(Site.SIGNAL_EDITED, FenixEduLearningContextListener::handleSiteEdition);
         FenixFramework.getDomainModel().registerDeletionListener(ExecutionCourse.class, (executionCourse) -> {
             if (executionCourse.getSite() != null) {
@@ -206,55 +202,6 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 post.setActive(true);
             }
         }
-    }
-
-    private static void handleThesisProposalApproval(final DomainObjectEvent<Thesis> event) {
-        Thesis thesis = event.getInstance();
-        if (thesis.getProposedDiscussed() == null || thesis.getDegree().getSite() == null) {
-            return;
-        }
-
-        Category cat = thesis.getDegree().getSite().categoryForSlug("announcement");
-
-        if (cat != null) {
-            Post post = new Post(cat.getSite());
-            post.addCategories(cat);
-            post.setLocation(new LocalizedString(I18N.getLocale(), thesis.getProposedPlace()));
-
-            LocalizedString subject = BundleUtil.getLocalizedString(Bundle.MESSAGING, "thesis.announcement.subject",
-                    thesis.getStudent().getPerson().getName());
-
-            LocalizedString body = BundleUtil.getLocalizedString(Bundle.MESSAGING, "thesis.announcement.body");
-
-            body = body.map(bodyFormat -> MessageFormat.format(bodyFormat, thesis.getStudent().getPerson().getName(),
-                    getDate(thesis.getProposedDiscussed()), hasPlace(thesis), thesis.getProposedPlace(),
-                    hasTime(thesis.getProposedDiscussed()), getTime(thesis.getProposedDiscussed()), thesis.getTitle()));
-
-            post.setName(subject);
-            post.setBody(body);
-        }
-
-    }
-
-    private static int hasPlace(final Thesis thesis) {
-        String place = thesis.getProposedPlace();
-        return place == null || place.trim().length() == 0 ? 0 : 1;
-    }
-
-    private static String getTime(final DateTime dateTime) {
-        return String.format(I18N.getLocale(), "%tR", dateTime.toDate());
-    }
-
-    private static int hasTime(final DateTime proposedDiscussed) {
-        if (proposedDiscussed.getHourOfDay() == 0 && proposedDiscussed.getMinuteOfHour() == 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-    }
-
-    private static String getDate(final DateTime dateTime) {
-        return String.format(I18N.getLocale(), "%1$td de %1$tB de %1$tY", dateTime.toDate());
     }
 
     @Override
