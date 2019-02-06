@@ -18,13 +18,30 @@
  */
 package org.fenixedu.learning.api;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import org.fenixedu.academic.domain.*;
+import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static org.fenixedu.academic.domain.ExecutionYear.COMPARATOR_BY_YEAR;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Stream;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.fenixedu.academic.domain.Coordinator;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.Lesson;
+import org.fenixedu.academic.domain.SchoolClass;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.bennu.core.groups.Group;
@@ -39,38 +56,14 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.format.ISODateTimeFormat;
 
-import javax.ws.rs.*;
-import java.util.*;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static org.fenixedu.academic.domain.ExecutionYear.COMPARATOR_BY_YEAR;
+import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 @Path("/fenixedu-learning/events")
 public class EventsResource {
-
-    private static Collection<ScheduleEventBean> projectEvents(Project project, ExecutionCourse executionCourse,
-            Interval interval) {
-        DateTime projectStart = project.getProjectBeginDateTime();
-        DateTime projectEnd = project.getProjectEndDateTime();
-
-        Set<ScheduleEventBean> events = new HashSet<>();
-
-        if (interval.contains(projectStart)) {
-            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(),
-                    project.getPresentationName(), projectStart, projectStart.plusHours(1), null, executionCourse.getSiteUrl(),
-                    colorForType(project.getEvaluationType()), null, null));
-        }
-        if (interval.contains(projectEnd)) {
-            events.add(new ScheduleEventBean(executionCourse.getPrettyAcronym(), project.getEvaluationType().toString(),
-                    project.getPresentationName(), projectEnd.minusHours(1), projectEnd, null, executionCourse.getSiteUrl(),
-                    colorForType(project.getEvaluationType()), null, null));
-        }
-
-        return events;
-    }
 
     private static String colorForType(EvaluationType type) {
         return ScheduleEventBean.COLORS[type.getType() % ScheduleEventBean.COLORS.length];
@@ -197,34 +190,7 @@ public class EventsResource {
     }
 
     private Collection<ScheduleEventBean> allPublicEvaluations(Degree degree, Interval interval) {
-        Set<ScheduleEventBean> allEvaluations = new HashSet<>(writtenEvaluations(degree, interval));
-        allEvaluations.addAll(projects(degree, interval));
-        return allEvaluations;
-    }
-
-    private Collection<ScheduleEventBean> writtenEvaluations(Degree degree, Interval interval) {
-        Set<ScheduleEventBean> events = new HashSet<>();
-        allExecutionCourses(degree).forEach(executionCourse -> executionCourse.getAssociatedWrittenEvaluations().stream()
-                .filter(writtenEval -> writtenEval.getBeginningDateTime() != null
-                        && interval.contains(writtenEval.getBeginningDateTime()))
-                .forEach(writtenEval -> events.add(createEventBean(executionCourse, writtenEval))));
-        return events;
-    }
-
-    private ScheduleEventBean createEventBean(ExecutionCourse executionCourse, WrittenEvaluation evaluation) {
-        return new ScheduleEventBean(executionCourse.getPrettyAcronym(), evaluation.getEvaluationType().toString(),
-                executionCourse.getName(), evaluation.getBeginningDateTime(), evaluation.getEndDateTime(), null,
-                executionCourse.getSiteUrl(), colorForType(evaluation.getEvaluationType()), null, null);
-    }
-
-    private Collection<ScheduleEventBean> projects(Degree degree, Interval interval) {
-        Set<ScheduleEventBean> projects = Sets.newHashSet();
-        allExecutionCourses(degree).forEach(executionCourse -> {
-            for (Project project : executionCourse.getAssociatedProjects()) {
-                projects.addAll(projectEvents(project, executionCourse, interval));
-            }
-        });
-        return projects;
+        return new HashSet<>();
     }
 
     private Stream<ExecutionCourse> allExecutionCourses(Degree degree) {
@@ -237,10 +203,9 @@ public class EventsResource {
         boolean isOpenPeriod = !executionCourse.getExecutionPeriod().isNotOpen();
         boolean isLogged = Authenticate.isLogged();
         boolean isAllocationManager = isLogged && Group.dynamic("resourceAllocationManager").isMember(Authenticate.getUser());
-        boolean isCoordinator =
-                executionCourse.getDegreesSortedByDegreeName().stream()
-                        .flatMap(degree -> degree.getCurrentCoordinators().stream()).map(Coordinator::getPerson)
-                        .filter(coordinator -> coordinator.equals(AccessControl.getPerson())).findFirst().isPresent();
+        boolean isCoordinator = executionCourse.getDegreesSortedByDegreeName().stream()
+                .flatMap(degree -> degree.getCurrentCoordinators().stream()).map(Coordinator::getPerson)
+                .filter(coordinator -> coordinator.equals(AccessControl.getPerson())).findFirst().isPresent();
         return isOpenPeriod || (isLogged && (isAllocationManager || isCoordinator));
     }
 

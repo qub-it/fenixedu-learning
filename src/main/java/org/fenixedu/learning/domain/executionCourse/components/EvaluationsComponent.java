@@ -18,15 +18,9 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
-import static java.util.stream.Collectors.toList;
+import java.util.Collections;
 
-import java.util.Comparator;
-import java.util.List;
-
-import org.fenixedu.academic.domain.Evaluation;
-import org.fenixedu.academic.domain.Exam;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.Project;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -34,26 +28,14 @@ import org.fenixedu.cms.rendering.TemplateContext;
 @ComponentType(name = "Evaluations", description = "Evaluations for an Execution Course")
 public class EvaluationsComponent extends BaseExecutionCourseComponent {
 
-    private static final Comparator<Evaluation> EVALUATION_COMPARATOR = Comparator.comparing(Evaluation::getEvaluationDate);
-    private static final Comparator<Project> PROJECT_COMPARATOR =
-            Comparator.comparing(Project::getProjectBeginDateTime).thenComparing(Project::getProjectEndDateTime)
-                    .thenComparing(Project::getName);
-
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
         globalContext.put("comment", executionCourse.getComment());
-        globalContext.put("adHocEvaluations", executionCourse.getOrderedAssociatedAdHocEvaluations());
-        globalContext.put("projects",
-                executionCourse.getAssociatedProjects().stream().sorted(PROJECT_COMPARATOR).collect(toList()));
-        globalContext.put("publishedExams", publishedExams(executionCourse));
-        globalContext.put("writtenTests",
-                executionCourse.getAssociatedWrittenTests().stream().sorted(EVALUATION_COMPARATOR).collect(toList()));
-    }
-
-    private List<Exam> publishedExams(ExecutionCourse executionCourse) {
-        return executionCourse.getAssociatedExams().stream().filter(Exam::isExamsMapPublished).sorted(EVALUATION_COMPARATOR)
-                .collect(toList());
+        globalContext.put("adHocEvaluations", Collections.emptyList()); // deprecated evaluation type
+        globalContext.put("projects", Collections.emptyList()); // deprecated evaluation type
+        globalContext.put("publishedExams", Collections.emptyList()); // deprecated evaluation type
+        globalContext.put("writtenTests", Collections.emptyList()); // deprecated evaluation type
     }
 
 }

@@ -18,14 +18,8 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.Curriculum;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
@@ -40,14 +34,7 @@ public class ObjectivesComponent extends BaseExecutionCourseComponent {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
         globalContext.put("executionPeriod", executionCourse.getExecutionPeriod());
         globalContext.put("competenceCourseBeans", CompetenceCourseBean.approvedCompetenceCourses(executionCourse));
-        globalContext.put("curriculumByCurricularCourse", curriculumsByCurricularCourses(executionCourse));
+        globalContext.put("curriculumByCurricularCourse", Collections.emptyMap()); // deprecated Curriculum
     }
 
-    private Map<CurricularCourse, Curriculum> curriculumsByCurricularCourses(ExecutionCourse executionCourse) {
-        Date end = executionCourse.getExecutionPeriod().getExecutionYear().getEndDate();
-        return executionCourse.getCurricularCoursesSortedByDegreeAndCurricularCourseName().stream()
-                .filter(curricularCourse -> !curricularCourse.isBolonhaDegree())
-                .map(curricularCourse -> curricularCourse.findLatestCurriculumModifiedBefore(end)).filter(Objects::nonNull)
-                .collect(Collectors.toMap(Curriculum::getCurricularCourse, Function.identity()));
-    }
 }

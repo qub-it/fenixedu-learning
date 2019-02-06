@@ -34,21 +34,17 @@ public class EvaluationMethodsComponent extends BaseExecutionCourseComponent {
     public void handle(final Page page, final TemplateContext componentContext, final TemplateContext globalContext) {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
         LocalizedString evaluationMethod = getEvaluationMethod(executionCourse);
-        globalContext.put("evaluationMethod", executionCourse.getEvaluationMethod());
+        globalContext.put("evaluationMethod", null);
         globalContext.put("evaluationMethodText", evaluationMethod.getContent());
         globalContext.put("evaluationMethodLocalizedString", evaluationMethod);
     }
 
     private LocalizedString getEvaluationMethod(final ExecutionCourse executionCourse) {
-        if (executionCourse.getEvaluationMethod() != null) {
-            return executionCourse.getEvaluationMethod().getEvaluationElements();
-        } else {
 
-            final Set<CompetenceCourse> competences = executionCourse.getCompetenceCourses();
-            final CompetenceCourse competence = competences.isEmpty() ? null : competences.iterator().next();
-            return competence == null ? new LocalizedString() : competence
-                    .getLocalizedEvaluationMethod(executionCourse.getExecutionPeriod());
-        }
+        final Set<CompetenceCourse> competences = executionCourse.getCompetenceCourses();
+        final CompetenceCourse competence = competences.isEmpty() ? null : competences.iterator().next();
+        return competence == null ? new LocalizedString() : competence
+                .getLocalizedEvaluationMethod(executionCourse.getExecutionPeriod());
     }
 
 }
