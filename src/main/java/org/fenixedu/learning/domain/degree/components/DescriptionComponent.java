@@ -49,7 +49,7 @@ public class DescriptionComponent extends DegreeSiteComponent {
 
         Collection<Space> campi = degree.getCampus(targetExecutionYear);
         if (campi.isEmpty()) {
-            campi = degree.getCurrentCampus();
+//            campi = degree.getCurrentCampus();
         }
         global.put("campi", campi.stream().map(campus -> campus.getName()).collect(Collectors.toList()));
 
@@ -59,7 +59,7 @@ public class DescriptionComponent extends DegreeSiteComponent {
         }
         global.put("coordinators", responsibleCoordinatorsTeachers);
 
-        DegreeInfo degreeInfo = targetExecutionYear.getDegreeInfo(degree);
+        DegreeInfo degreeInfo = degree.getDegreeInfoFor(targetExecutionYear);
         if (degreeInfo == null) {
             degreeInfo = degree.getMostRecentDegreeInfo(targetExecutionYear.getAcademicInterval());
         }
