@@ -39,7 +39,7 @@ public class MarksComponent extends BaseExecutionCourseComponent {
         globalContext.put("attendsMap", attendsMap);
         globalContext.put("numberOfStudents", attendsMap.size());
         globalContext.put("dont-cache-pages-in-search-engines", Boolean.TRUE);
-        globalContext.put("evaluations", executionCourse.getOrderedAssociatedEvaluations());
+        globalContext.put("evaluations", executionCourse.getAssociatedEvaluationsSet());
     }
 
     private Map<Attends, Map<Evaluation, Mark>> attendsMap(ExecutionCourse executionCourse) {
