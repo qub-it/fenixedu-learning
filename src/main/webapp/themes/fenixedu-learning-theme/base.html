@@ -87,7 +87,7 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-right">
           <li></li>
-            {% if request.user is null %}
+            {% if not request.user.authenticated %}
               <li><a href="{{request.contextPath}}/login">Login</a></li>
             {% else %}
               <li><a>{{request.user.displayName}}</a></li>
