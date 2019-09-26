@@ -44,6 +44,7 @@ import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.academic.domain.SchoolClass;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.EvaluationType;
+import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.cms.domain.Site;
@@ -200,7 +201,7 @@ public class EventsResource {
     }
 
     private boolean hasPermissionToViewSchedule(ExecutionCourse executionCourse) {
-        boolean isOpenPeriod = !executionCourse.getExecutionPeriod().isNotOpen();
+        boolean isOpenPeriod = executionCourse.getExecutionPeriod().getState() != PeriodState.NOT_OPEN;
         boolean isLogged = Authenticate.isLogged();
         boolean isAllocationManager = isLogged && Group.dynamic("resourceAllocationManager").isMember(Authenticate.getUser());
         boolean isCoordinator = executionCourse.getDegreesSortedByDegreeName().stream()

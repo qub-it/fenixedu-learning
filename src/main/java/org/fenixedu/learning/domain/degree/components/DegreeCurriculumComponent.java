@@ -242,7 +242,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
         public boolean isOptional() {
             // qubExtension, report optional also due to course group
-            return curricularCourse.isOptional() || context.getParentCourseGroup().isOptionalCourseGroup();
+            return curricularCourse.isOptionalCurricularCourse() || context.getParentCourseGroup().getIsOptional();
         }
 
         public LocalizedString getName() {

@@ -58,7 +58,7 @@ public class CurricularCourseComponent extends DegreeSiteComponent {
         wrap.put("name", curricularCourse.getNameI18N(period));
         wrap.put("degreeCurricularPlanName", curricularCourse.getDegreeCurricularPlan().getPresentationName());
         wrap.put("acronym", curricularCourse.getAcronym(period));
-        wrap.put("isOptional", curricularCourse.isOptional());
+        wrap.put("isOptional", curricularCourse.isOptionalCurricularCourse());
         wrap.put(
                 "executionCourses",
                 curricularCourse.getAssociatedExecutionCoursesSet().stream()

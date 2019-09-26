@@ -22,37 +22,43 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.commons.i18n.LocalizedString;
+
+import com.google.common.base.MoreObjects;
 
 public class CompetenceCourseBean {
     private final CompetenceCourse competenceCourse;
-    private final ExecutionSemester executionSemester;
+    private final ExecutionInterval executionInterval;
     private final Set<CurricularCourse> curricularCourses;
     private final LocalizedString name;
     private final LocalizedString objectives;
     private final LocalizedString program;
 
     public CompetenceCourseBean(CompetenceCourse competenceCourse, Set<CurricularCourse> curricularCourses,
-            ExecutionSemester executionSemester) {
+            ExecutionInterval executionInterval) {
         this.competenceCourse = competenceCourse;
-        this.executionSemester = executionSemester;
+        this.executionInterval = executionInterval;
         this.curricularCourses = curricularCourses;
-        this.name = competenceCourse.getNameI18N(executionSemester);
-        this.objectives = competenceCourse.getObjectivesI18N(executionSemester);
-        this.program = competenceCourse.getProgramI18N(executionSemester);
+        this.name = competenceCourse.getNameI18N(executionInterval);
+        this.objectives = competenceCourse.getObjectivesI18N(executionInterval);
+        this.program = competenceCourse.getProgramI18N(executionInterval);
     }
 
     public CompetenceCourse getCompetenceCourse() {
         return competenceCourse;
     }
 
-    public ExecutionSemester getExecutionSemester() {
-        return executionSemester;
+    @Deprecated
+    public ExecutionInterval getExecutionSemester() {
+        return getExecutionInterval();
+    }
+
+    public ExecutionInterval getExecutionInterval() {
+        return executionInterval;
     }
 
     public Set<CurricularCourse> getCurricularCourses() {
@@ -77,7 +83,7 @@ public class CompetenceCourseBean {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).add("name", this.name).add("objectives", this.objectives)
-                .add("executionSemester", executionSemester).add("curricularCourses", curricularCourses).toString();
+                .add("executionInterval", executionInterval).add("curricularCourses", curricularCourses).toString();
     }
 
     public LocalizedString getProgram() {
