@@ -18,8 +18,6 @@
  */
 package org.fenixedu.learning.domain.degree.components;
 
-import static org.fenixedu.academic.domain.ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR;
-
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +30,7 @@ import java.util.stream.Collectors;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
@@ -60,37 +58,37 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
                 .sorted(Comparator.reverseOrder()).collect(Collectors.toList()));
     }
 
-    public SortedMap<ExecutionSemester, SortedMap<Integer, SortedSet<ExecutionCourse>>> executionCourses(final Degree degree) {
-        TreeMap<ExecutionSemester, SortedMap<Integer, SortedSet<ExecutionCourse>>> result =
-                Maps.newTreeMap(COMPARATOR_BY_SEMESTER_AND_YEAR);
+    public SortedMap<ExecutionInterval, SortedMap<Integer, SortedSet<ExecutionCourse>>> executionCourses(final Degree degree) {
+        TreeMap<ExecutionInterval, SortedMap<Integer, SortedSet<ExecutionCourse>>> result =
+                Maps.newTreeMap(ExecutionInterval.COMPARATOR_BY_BEGIN_DATE);
 
-        final ExecutionSemester current = ExecutionSemester.readActualExecutionSemester();
-        final ExecutionSemester previous = current.getPreviousExecutionPeriod();
-        final ExecutionSemester next = current.getNextExecutionPeriod();
+        final ExecutionInterval current = ExecutionInterval.findFirstCurrentChild(null);
+        final ExecutionInterval previous = current.getPrevious();
+        final ExecutionInterval next = current.getNext();
         final boolean hasNext = next.getExecutionYear().isCurrent() && next != null && next.getState().equals(PeriodState.OPEN);
-        final ExecutionSemester selected = hasNext ? next : previous;
+        final ExecutionInterval selected = hasNext ? next : previous;
 
         result.put(selected, executionCourses(degree, selected));
         result.put(current, executionCourses(degree, current));
         return result;
     }
 
-    public SortedMap<Integer, SortedSet<ExecutionCourse>> executionCourses(Degree degree, ExecutionSemester executionSemester) {
+    public SortedMap<Integer, SortedSet<ExecutionCourse>> executionCourses(Degree degree, ExecutionInterval executionInterval) {
         SortedMap<Integer, SortedSet<ExecutionCourse>> courses = new TreeMap<>();
 
-        if (executionSemester != null) {
+        if (executionInterval != null) {
             DegreeCurricularPlanServices
-                    .getDegreeCurricularPlansForYear(degree, Optional.of(executionSemester.getExecutionYear()))
-                    .forEach(plan -> addExecutionCourses(plan.getRoot(), courses, executionSemester));
+                    .getDegreeCurricularPlansForYear(degree, Optional.of(executionInterval.getExecutionYear()))
+                    .forEach(plan -> addExecutionCourses(plan.getRoot(), courses, executionInterval));
         }
 
         return courses;
     }
 
     private void addExecutionCourses(final CourseGroup courseGroup, Map<Integer, SortedSet<ExecutionCourse>> courses,
-            final ExecutionSemester... executionPeriods) {
+            final ExecutionInterval... executionPeriods) {
         for (final Context context : courseGroup.getChildContextsSet()) {
-            for (final ExecutionSemester executionSemester : executionPeriods) {
+            for (final ExecutionInterval executionSemester : executionPeriods) {
                 if (context.isValid(executionSemester)) {
                     final DegreeModule degreeModule = context.getChildDegreeModule();
                     if (degreeModule.isLeaf()) {
