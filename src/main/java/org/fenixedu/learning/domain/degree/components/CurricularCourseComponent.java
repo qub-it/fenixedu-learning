@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -43,16 +43,16 @@ public class CurricularCourseComponent extends DegreeSiteComponent {
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         CurricularCourse curricularCourse = getDomainObject(globalContext.getRequestContext()[1]);
-        ExecutionSemester period = getExecutionSemester(curricularCourse, globalContext.getRequestContext());
+        ExecutionInterval period = getExecutionSemester(curricularCourse, globalContext.getRequestContext());
         globalContext.put("curricularCourse", createWrap(curricularCourse, period));
     }
 
-    private ExecutionSemester getExecutionSemester(CurricularCourse curricularCourse, String[] request) {
+    private ExecutionInterval getExecutionSemester(CurricularCourse curricularCourse, String[] request) {
         return request.length > 2 ? getDomainObject(request[2]) : curricularCourse.getParentDegreeCurricularPlan()
                 .getMostRecentExecutionYear().getLastExecutionPeriod();
     }
 
-    private HashMap<String, Object> createWrap(CurricularCourse curricularCourse, ExecutionSemester period) {
+    private HashMap<String, Object> createWrap(CurricularCourse curricularCourse, ExecutionInterval period) {
         HashMap<String, Object> wrap = Maps.newHashMap();
         wrap.put("period", period);
         wrap.put("name", curricularCourse.getNameI18N(period));

@@ -21,7 +21,6 @@ package org.fenixedu.learning.domain.degree.components;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
-import static org.fenixedu.academic.domain.ExecutionSemester.readActualExecutionSemester;
 import static org.fenixedu.academic.domain.SchoolClass.COMPARATOR_BY_NAME;
 import static org.fenixedu.academic.util.PeriodState.NOT_OPEN;
 import static org.fenixedu.academic.util.PeriodState.OPEN;
@@ -36,7 +35,7 @@ import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.SchoolClass;
 import org.fenixedu.academic.domain.person.RoleType;
@@ -61,15 +60,15 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
         global.put("timetablePage",
                 pageForComponent(page.getSite(), ClassScheduleComponent.class).map(Page::getAddress).orElse(null));
 
-        ExecutionSemester selectedSemester = getExecutionSemester(global.getRequestContext());
-        ExecutionSemester otherSemester = getOtherExecutionSemester(selectedSemester);
+        ExecutionInterval selectedSemester = getExecutionSemester(global.getRequestContext());
+        ExecutionInterval otherSemester = getOtherExecutionSemester(selectedSemester);
 
         SortedMap<Integer, Set<SchoolClass>> selectedClasses = classesByCurricularYear(degree, selectedSemester);
         SortedMap<Integer, Set<SchoolClass>> nextClasses = classesByCurricularYear(degree, otherSemester);
         global.put("classesByCurricularYearAndSemesters", of(selectedSemester, selectedClasses, otherSemester, nextClasses));
     }
 
-    private SortedMap<Integer, Set<SchoolClass>> classesByCurricularYear(Degree degree, ExecutionSemester semester) {
+    private SortedMap<Integer, Set<SchoolClass>> classesByCurricularYear(Degree degree, ExecutionInterval semester) {
         DegreeCurricularPlan plan =
                 DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(semester.getExecutionYear()));
         Predicate<SchoolClass> predicate = schoolClass -> schoolClass.getExecutionDegree().getDegreeCurricularPlan() == plan;
@@ -77,12 +76,12 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
                 groupingBy(SchoolClass::getAnoCurricular, TreeMap::new, toCollection(() -> Sets.newTreeSet(COMPARATOR_BY_NAME))));
     }
 
-    private ExecutionSemester getOtherExecutionSemester(ExecutionSemester semester) {
-        ExecutionSemester next = semester.getNextExecutionPeriod();
-        return next != null && canViewNextExecutionSemester(next) ? next : semester.getPreviousExecutionPeriod();
+    private ExecutionInterval getOtherExecutionSemester(ExecutionInterval semester) {
+        ExecutionInterval next = semester.getNext();
+        return next != null && canViewNextExecutionSemester(next) ? next : semester.getPrevious();
     }
 
-    private boolean canViewNextExecutionSemester(ExecutionSemester nextExecutionSemester) {
+    private boolean canViewNextExecutionSemester(ExecutionInterval nextExecutionSemester) {
         Predicate<Person> hasPerson = person -> person != null;
         Predicate<Person> isCoordinator = person -> RoleType.COORDINATOR.isMember(person.getUser());
         Predicate<Person> isManager = person -> RoleType.RESOURCE_ALLOCATION_MANAGER.isMember(person.getUser());
@@ -90,7 +89,7 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
                 && hasPerson.and(isManager.or(isCoordinator)).test(getUser().getPerson()));
     }
 
-    private ExecutionSemester getExecutionSemester(String[] requestContext) {
-        return requestContext.length > 2 ? getDomainObject(requestContext[1]) : readActualExecutionSemester();
+    private ExecutionInterval getExecutionSemester(String[] requestContext) {
+        return requestContext.length > 2 ? getDomainObject(requestContext[1]) : ExecutionInterval.findFirstCurrentChild(null);
     }
 }
