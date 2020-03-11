@@ -181,15 +181,15 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public Stream<CurricularCourseWrap> getCurricularCourses() {
-            return courseGroup.getSortedOpenChildContextsWithCurricularCourses(executionInterval).stream()
-                    .map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl))
+            return courseGroup.getOpenChildContextsForExecutionAggregation(CurricularCourse.class, executionInterval).stream()
+                    .sorted().map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl))
 
                     // qubExtension, don't show courses with some rules
                     .filter(course -> course.getRulesObjects().noneMatch(EnrolmentToBeApprovedByCoordinator.class::isInstance));
         }
 
         public Stream<CourseGroupWrap> getCourseGroups() {
-            return courseGroup.getSortedOpenChildContextsWithCourseGroups(executionInterval).stream()
+            return courseGroup.getOpenChildContextsForExecutionAggregation(CourseGroup.class, executionInterval).stream().sorted()
                     .map(context -> new CourseGroupWrap(context, (CourseGroup) context.getChildDegreeModule(), executionInterval,
                             pageUrl));
         }
