@@ -1,3 +1,5 @@
+- Refactor: remove deprecated curricular course slots references
+
 3.10.0-FORK (11-03-2020)
 - Refactor: upgraded fenixedu-academic-core
 

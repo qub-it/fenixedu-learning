@@ -66,7 +66,6 @@ public class CurricularCourseComponent extends DegreeSiteComponent {
                         .collect(toList()));
         wrap.put("parentContexts", curricularCourse.getParentContextsByExecutionYear(period.getExecutionYear()));
         wrap.put("weight", curricularCourse.getWeight(period));
-        wrap.put("prerequisites", curricularCourse.getPrerequisitesI18N());
         wrap.put("objectives", curricularCourse.getObjectivesI18N(period));
         wrap.put("program", curricularCourse.getProgramI18N(period));
         wrap.put("evaluationMethod", curricularCourse.getEvaluationMethodI18N(period));
