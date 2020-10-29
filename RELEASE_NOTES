@@ -1,3 +1,5 @@
+- Refactor: change references of SchoolClass portuguese slot to english
+
 3.10.1-FORK (27-10-2020)
 - Refactor: remove deprecated curricular course slots references
 
@@ -5,7 +7,7 @@
 - Refactor: upgraded fenixedu-academic-core
 
 3.9.0-FORK (24-12-2019)
-- Refactor: Upgraded fenixedu-academic-core and replaced ExecutionSemester references to ExecutionInterval
+- Refactor: upgraded fenixedu-academic-core and replaced ExecutionSemester references to ExecutionInterval
 
 3.8.0-FORK (25-07-2019)
 - Refactor: upgraded fenixedu-academic-core 

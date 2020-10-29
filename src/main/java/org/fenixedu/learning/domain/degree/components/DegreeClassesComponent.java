@@ -72,8 +72,8 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
         DegreeCurricularPlan plan =
                 DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(semester.getExecutionYear()));
         Predicate<SchoolClass> predicate = schoolClass -> schoolClass.getExecutionDegree().getDegreeCurricularPlan() == plan;
-        return semester.getSchoolClassesSet().stream().filter(predicate).collect(
-                groupingBy(SchoolClass::getAnoCurricular, TreeMap::new, toCollection(() -> Sets.newTreeSet(COMPARATOR_BY_NAME))));
+        return semester.getSchoolClassesSet().stream().filter(predicate).collect(groupingBy(SchoolClass::getCurricularYear,
+                TreeMap::new, toCollection(() -> Sets.newTreeSet(COMPARATOR_BY_NAME))));
     }
 
     private ExecutionInterval getOtherExecutionSemester(ExecutionInterval semester) {
