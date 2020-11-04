@@ -31,7 +31,7 @@ public class EvaluationsComponent extends BaseExecutionCourseComponent {
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
-        globalContext.put("comment", executionCourse.getComment());
+        globalContext.put("comment", "");
         globalContext.put("adHocEvaluations", Collections.emptyList()); // deprecated evaluation type
         globalContext.put("projects", Collections.emptyList()); // deprecated evaluation type
         globalContext.put("publishedExams", Collections.emptyList()); // deprecated evaluation type
