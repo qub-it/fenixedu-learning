@@ -52,6 +52,7 @@ import org.fenixedu.cms.domain.component.StaticPost;
 import org.fenixedu.cms.routing.CMSRenderer;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.learning.FenixEduLearningConfiguration;
 import org.fenixedu.learning.domain.degree.DegreeRequestHandler;
 import org.fenixedu.learning.domain.degree.DegreeSiteListener;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseListener;
@@ -74,6 +75,11 @@ public class FenixEduLearningContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
+
+        if (!Boolean.TRUE.equals(FenixEduLearningConfiguration.getConfiguration().getDomainListenersEnabled())) {
+            return;
+        }
+
         Signal.register(Summary.CREATE_SIGNAL, (final DomainObjectEvent<Summary> event) -> {
             Summary summary = event.getInstance();
             SummaryListener.updatePost(new Post(summary.getExecutionCourse().getSite()), summary);
