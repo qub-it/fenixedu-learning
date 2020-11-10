@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>fenixedu-learning</artifactId>
-    <version>3.10.3-FORK</version>
+    <version>3.10.4-FORK</version>
     <packaging>jar</packaging>
 
     <name>FenixEdu Learning</name>
