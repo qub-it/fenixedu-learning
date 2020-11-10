@@ -18,6 +18,8 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -25,6 +27,7 @@ import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Evaluation;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Mark;
+import org.fenixedu.academic.util.DateFormatUtil;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -46,7 +49,7 @@ public class MarksComponent extends BaseExecutionCourseComponent {
         final Map<Attends, Map<Evaluation, Mark>> attendsMap =
                 new TreeMap<Attends, Map<Evaluation, Mark>>(Attends.COMPARATOR_BY_STUDENT_NUMBER);
         for (final Attends attends : executionCourse.getAttendsSet()) {
-            final Map<Evaluation, Mark> evaluationsMap = new TreeMap<Evaluation, Mark>(ExecutionCourse.EVALUATION_COMPARATOR);
+            final Map<Evaluation, Mark> evaluationsMap = new TreeMap<Evaluation, Mark>(EVALUATION_COMPARATOR);
             attendsMap.put(attends, evaluationsMap);
             for (final Evaluation evaluation : executionCourse.getAssociatedEvaluationsSet()) {
                 if (evaluation.getPublishmentMessage() != null) {
@@ -61,4 +64,20 @@ public class MarksComponent extends BaseExecutionCourseComponent {
         }
         return attendsMap;
     }
+
+    private static final Comparator<Evaluation> EVALUATION_COMPARATOR = new Comparator<Evaluation>() {
+
+        @Override
+        public int compare(Evaluation evaluation1, Evaluation evaluation2) {
+            final String evaluation1ComparisonString = evaluationComparisonString(evaluation1);
+            final String evaluation2ComparisonString = evaluationComparisonString(evaluation2);
+            return evaluation1ComparisonString.compareTo(evaluation2ComparisonString);
+        }
+
+        private String evaluationComparisonString(final Evaluation evaluation) {
+            return evaluation.getEvaluationDate() != null ? new SimpleDateFormat("yyyy/MM/dd")
+                    .format(evaluation.getEvaluationDate()) + evaluation.getExternalId() : evaluation.getExternalId();
+        }
+    };
+
 }

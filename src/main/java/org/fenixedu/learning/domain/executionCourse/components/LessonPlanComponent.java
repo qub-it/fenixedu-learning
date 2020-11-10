@@ -39,7 +39,7 @@ public class LessonPlanComponent extends BaseExecutionCourseComponent {
         if (executionCourse.getLessonPlanningAvailable()) {
             Map<ShiftType, List<LessonPlanning>> lessonPlanningsMap = Maps.newHashMap();
             for (ShiftType shiftType : executionCourse.getShiftTypes()) {
-                List<LessonPlanning> lessonPlanningsOrderedByOrder = executionCourse.getLessonPlanningsOrderedByOrder(shiftType);
+                List<LessonPlanning> lessonPlanningsOrderedByOrder = LessonPlanning.findOrdered(executionCourse, shiftType);
                 if (!lessonPlanningsOrderedByOrder.isEmpty()) {
                     lessonPlanningsMap.put(shiftType, lessonPlanningsOrderedByOrder);
                 }

@@ -18,8 +18,11 @@
  */
 package org.fenixedu.learning.domain.executionCourse;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
@@ -74,10 +77,31 @@ public class CompetenceCourseBean {
     }
 
     public static List<CompetenceCourseBean> approvedCompetenceCourses(ExecutionCourse executionCourse) {
-        return executionCourse.getCurricularCoursesIndexedByCompetenceCourse().entrySet().stream()
+        return getCurricularCoursesIndexedByCompetenceCourse(executionCourse).entrySet().stream()
                 .filter(entry -> entry.getKey().isApproved())
                 .map(entry -> new CompetenceCourseBean(entry.getKey(), entry.getValue(), executionCourse.getExecutionPeriod()))
                 .collect(Collectors.toList());
+    }
+
+    private static Map<CompetenceCourse, Set<CurricularCourse>> getCurricularCoursesIndexedByCompetenceCourse(
+            final ExecutionCourse executionCourse) {
+        final Map<CompetenceCourse, Set<CurricularCourse>> curricularCourseMap =
+                new HashMap<CompetenceCourse, Set<CurricularCourse>>();
+        for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
+            final CompetenceCourse competenceCourse = curricularCourse.getCompetenceCourse();
+            if (competenceCourse != null) {
+                final Set<CurricularCourse> curricularCourses;
+                if (curricularCourseMap.containsKey(competenceCourse)) {
+                    curricularCourses = curricularCourseMap.get(competenceCourse);
+                } else {
+                    curricularCourses =
+                            new TreeSet<CurricularCourse>(CurricularCourse.CURRICULAR_COURSE_COMPARATOR_BY_DEGREE_AND_NAME);
+                    curricularCourseMap.put(competenceCourse, curricularCourses);
+                }
+                curricularCourses.add(curricularCourse);
+            }
+        }
+        return curricularCourseMap;
     }
 
     @Override
