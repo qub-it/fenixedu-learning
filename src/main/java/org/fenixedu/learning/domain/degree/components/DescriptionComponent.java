@@ -19,9 +19,11 @@
 package org.fenixedu.learning.domain.degree.components;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeInfo;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -53,9 +55,9 @@ public class DescriptionComponent extends DegreeSiteComponent {
         }
         global.put("campi", campi.stream().map(campus -> campus.getName()).collect(Collectors.toList()));
 
-        Collection<Teacher> responsibleCoordinatorsTeachers = degree.getResponsibleCoordinatorsTeachers(targetExecutionYear);
+        Collection<Teacher> responsibleCoordinatorsTeachers = getResponsibleCoordinatorsTeachers(degree, targetExecutionYear);
         if (responsibleCoordinatorsTeachers.isEmpty()) {
-            responsibleCoordinatorsTeachers = degree.getCurrentResponsibleCoordinatorsTeachers();
+            responsibleCoordinatorsTeachers = getCurrentResponsibleCoordinatorsTeachers(degree);
         }
         global.put("coordinators", responsibleCoordinatorsTeachers);
 
@@ -65,6 +67,18 @@ public class DescriptionComponent extends DegreeSiteComponent {
         }
         global.put("degreeInfo", degreeInfo);
 
+    }
+
+    private static Collection<Teacher> getResponsibleCoordinatorsTeachers(final Degree degree,
+            final ExecutionYear executionYear) {
+        return Coordinator.findCoordinators(degree, executionYear, true).map(c -> c.getPerson().getTeacher())
+                .filter(Objects::nonNull).sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private static Collection<Teacher> getCurrentResponsibleCoordinatorsTeachers(final Degree degree) {
+        return Coordinator.findLastCoordinators(degree, true).map(c -> c.getPerson().getTeacher()).filter(Objects::nonNull)
+                .sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER).collect(Collectors.toUnmodifiableList());
     }
 
     private ExecutionYear getTargetExecutionYear(TemplateContext global, Degree degree) {

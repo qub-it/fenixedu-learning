@@ -205,7 +205,7 @@ public class EventsResource {
         boolean isLogged = Authenticate.isLogged();
         boolean isAllocationManager = isLogged && Group.dynamic("resourceAllocationManager").isMember(Authenticate.getUser());
         boolean isCoordinator = executionCourse.getDegreesSortedByDegreeName().stream()
-                .flatMap(degree -> degree.getCurrentCoordinators().stream()).map(Coordinator::getPerson)
+                .flatMap(degree -> Coordinator.findLastCoordinators(degree, false)).map(Coordinator::getPerson)
                 .filter(coordinator -> coordinator.equals(AccessControl.getPerson())).findFirst().isPresent();
         return isOpenPeriod || (isLogged && (isAllocationManager || isCoordinator));
     }
