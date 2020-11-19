@@ -9,7 +9,7 @@ public class FenixEduLearningConfiguration {
     @ConfigurationManager(description = "FenixEdu Learning Configuration")
     public static interface ConfigurationProperties {
 
-        @ConfigurationProperty(key = "fenixedu.learning.domain.listeners.enabled", defaultValue = "true")
+        @ConfigurationProperty(key = "fenixedu.learning.domain.listeners.enabled", defaultValue = "false")
         public Boolean getDomainListenersEnabled();
 
     }
