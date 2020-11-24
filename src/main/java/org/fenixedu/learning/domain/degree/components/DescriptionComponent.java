@@ -72,13 +72,13 @@ public class DescriptionComponent extends DegreeSiteComponent {
     private static Collection<Teacher> getResponsibleCoordinatorsTeachers(final Degree degree,
             final ExecutionYear executionYear) {
         return Coordinator.findCoordinators(degree, executionYear, true).map(c -> c.getPerson().getTeacher())
-                .filter(Objects::nonNull).sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER)
+                .filter(Objects::nonNull).distinct().sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER)
                 .collect(Collectors.toUnmodifiableList());
     }
 
     private static Collection<Teacher> getCurrentResponsibleCoordinatorsTeachers(final Degree degree) {
         return Coordinator.findLastCoordinators(degree, true).map(c -> c.getPerson().getTeacher()).filter(Objects::nonNull)
-                .sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER).collect(Collectors.toUnmodifiableList());
+                .distinct().sorted(Teacher.TEACHER_COMPARATOR_BY_CATEGORY_AND_NUMBER).collect(Collectors.toUnmodifiableList());
     }
 
     private ExecutionYear getTargetExecutionYear(TemplateContext global, Degree degree) {
