@@ -65,7 +65,7 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
         final ExecutionInterval current = ExecutionInterval.findFirstCurrentChild(null);
         final ExecutionInterval previous = current.getPrevious();
         final ExecutionInterval next = current.getNext();
-        final boolean hasNext = next.getExecutionYear().isCurrent() && next != null && next.getState().equals(PeriodState.OPEN);
+        final boolean hasNext = next != null && next.getExecutionYear().isCurrent() && next.getState().equals(PeriodState.OPEN);
         final ExecutionInterval selected = hasNext ? next : previous;
 
         result.put(selected, executionCourses(degree, selected));
