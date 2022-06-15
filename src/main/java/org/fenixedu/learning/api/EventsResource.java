@@ -43,7 +43,6 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.academic.domain.SchoolClass;
 import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -65,10 +64,6 @@ import com.google.gson.JsonPrimitive;
 
 @Path("/fenixedu-learning/events")
 public class EventsResource {
-
-    private static String colorForType(EvaluationType type) {
-        return ScheduleEventBean.COLORS[type.getType() % ScheduleEventBean.COLORS.length];
-    }
 
     @GET
     @Path("/executionCourse/{course}")
