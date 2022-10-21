@@ -1,3 +1,6 @@
+- Refactor: Remove Branch group references 
+
+3.10.10-FORK (21-10-2022)
 - Refactor: Remove Branch group references
 - Refactor: Remove reference to deprecated EvaluationType
 
