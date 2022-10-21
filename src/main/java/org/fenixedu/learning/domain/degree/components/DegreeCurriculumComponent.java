@@ -209,7 +209,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
         // qubExtension
         public String getInitialStyle() {
-            return courseGroup.getIsOptional() || courseGroup instanceof BranchCourseGroup ? "display:none" : "";
+            return courseGroup.getIsOptional() || courseGroup.isBranchCourseGroup() ? "display:none" : "";
         }
 
         // qubExtension
