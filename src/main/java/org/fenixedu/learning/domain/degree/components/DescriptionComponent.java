@@ -20,6 +20,7 @@ package org.fenixedu.learning.domain.degree.components;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ import org.fenixedu.academic.domain.DegreeInfo;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -49,11 +51,9 @@ public class DescriptionComponent extends DegreeSiteComponent {
         ExecutionYear targetExecutionYear = getTargetExecutionYear(global, degree);
         global.put("year", targetExecutionYear.getYear());
 
-        Collection<Space> campi = degree.getCampus(targetExecutionYear);
-        if (campi.isEmpty()) {
-//            campi = degree.getCurrentCampus();
-        }
-        global.put("campi", campi.stream().map(campus -> campus.getName()).collect(Collectors.toList()));
+        final String campusName =
+                Optional.ofNullable(degree).map(Degree::getUnit).map(Unit::getCampus).map(Space::getName).orElse("");
+        global.put("campi", campusName);
 
         Collection<Teacher> responsibleCoordinatorsTeachers = getResponsibleCoordinatorsTeachers(degree, targetExecutionYear);
         if (responsibleCoordinatorsTeachers.isEmpty()) {
