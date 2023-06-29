@@ -18,17 +18,15 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.LessonPlanning;
-import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
-
-import com.google.common.collect.Maps;
 
 @ComponentType(name = "LessonsPlanning", description = "Lessons planing for an Execution Course")
 public class LessonPlanComponent extends BaseExecutionCourseComponent {
@@ -37,13 +35,13 @@ public class LessonPlanComponent extends BaseExecutionCourseComponent {
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
         if (executionCourse.getLessonPlanningAvailable()) {
-            Map<ShiftType, List<LessonPlanning>> lessonPlanningsMap = Maps.newHashMap();
-            for (ShiftType shiftType : executionCourse.getShiftTypes()) {
-                List<LessonPlanning> lessonPlanningsOrderedByOrder = LessonPlanning.findOrdered(executionCourse, shiftType);
-                if (!lessonPlanningsOrderedByOrder.isEmpty()) {
-                    lessonPlanningsMap.put(shiftType, lessonPlanningsOrderedByOrder);
-                }
-            }
+            Map<?, List<LessonPlanning>> lessonPlanningsMap = new HashMap<>();
+//            for (ShiftType shiftType : executionCourse.getShiftTypes()) {
+//                List<LessonPlanning> lessonPlanningsOrderedByOrder = LessonPlanning.findOrdered(executionCourse, shiftType);
+//                if (!lessonPlanningsOrderedByOrder.isEmpty()) {
+//                    lessonPlanningsMap.put(shiftType, lessonPlanningsOrderedByOrder);
+//                }
+//            }
             globalContext.put("lessonPlanningsMap", lessonPlanningsMap);
         }
     }

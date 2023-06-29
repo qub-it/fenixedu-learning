@@ -1,3 +1,5 @@
+- Refactor: Disable deprecated lesson plannings component
+
 3.10.11-FORK (08-02-2023)
 - Refactor: Remove Branch group references
 - Refactor: Make compatible with latest version of academic-core 
