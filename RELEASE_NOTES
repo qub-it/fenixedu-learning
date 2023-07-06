@@ -1,3 +1,5 @@
+- Refactor: Use single method to retrieve lesson events
+
 3.10.12-FORK (29-06-2023)
 - Refactor: Disable deprecated lesson plannings component
 

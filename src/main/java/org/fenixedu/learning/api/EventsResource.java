@@ -124,17 +124,7 @@ public class EventsResource {
     }
 
     private Stream<ScheduleEventBean> lessonEvents(Lesson lesson, Interval interval) {
-        return Stream.concat(lessonsWithoutInstances(lesson, interval), lessonWithInstances(lesson, interval));
-    }
-
-    private Stream<ScheduleEventBean> lessonsWithoutInstances(Lesson lesson, Interval interval) {
-        return lesson.getAllLessonIntervalsWithoutInstanceDates().stream()
-                .filter(i -> interval.contains(i) || i.contains(interval)).map(i -> createEventBean(lesson, i));
-    }
-
-    private Stream<ScheduleEventBean> lessonWithInstances(Lesson lesson, Interval interval) {
-        return lesson.getLessonInstancesSet().stream().filter(instance -> interval.contains(instance.getInterval()))
-                .map(instance -> createEventBean(lesson, instance.getInterval()));
+        return lesson.getAllLessonIntervals().stream().map(i -> createEventBean(lesson, i));
     }
 
     private ScheduleEventBean createEventBean(Lesson lesson, Interval interval) {
