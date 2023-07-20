@@ -28,8 +28,6 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.Professorship;
-import org.fenixedu.academic.domain.ProfessorshipPermissions;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.service.services.teacher.PublishMarks;
@@ -66,7 +64,6 @@ import com.google.common.base.Strings;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 @WebListener
 public class FenixEduLearningContextListener implements ServletContextListener {
@@ -102,14 +99,6 @@ public class FenixEduLearningContextListener implements ServletContextListener {
             ExecutionCourseListener.updateSiteSlug(event.getInstance());
         });
 
-        Signal.register(ProfessorshipPermissions.PROFESSORSHIP_PERMISSIONS_CHANGED,
-                (final DomainObjectEvent<ProfessorshipPermissions> event) -> {
-                    if (FenixFramework.isDomainObjectValid(event.getInstance())) {
-                        ExecutionCourseListener.updateProfessorship(event.getInstance().getProfessorship(),
-                                event.getInstance().getSections());
-                    }
-                });
-
         Signal.register(Degree.CREATED_SIGNAL, (final DomainObjectEvent<Degree> event) -> {
             DegreeSiteListener.create(event.getInstance());
         });
@@ -123,17 +112,6 @@ public class FenixEduLearningContextListener implements ServletContextListener {
                 site.delete();
             }
         });
-
-        ExecutionCourse.getRelationExecutionCourseProfessorship()
-                .addListener(new RelationAdapter<Professorship, ExecutionCourse>() {
-                    @Override
-                    public void beforeRemove(final Professorship o1, final ExecutionCourse o2) {
-                        if (o1 != null && o1.getExecutionCourse() != null) {
-                            ExecutionCourseListener.updateProfessorship(o1, false);
-                        }
-                        super.beforeRemove(o1, o2);
-                    }
-                });
 
         FenixFramework.getDomainModel().registerDeletionListener(Degree.class, (degree) -> {
             if (degree.getSite() != null) {

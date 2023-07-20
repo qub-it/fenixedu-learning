@@ -1,3 +1,5 @@
+- Refactor: Remove reference to deprecated ProfessorshipPermissions
+
 3.10.13-FORK (06-07-2023)
 - Refactor: Use single method to retrieve lesson events
 

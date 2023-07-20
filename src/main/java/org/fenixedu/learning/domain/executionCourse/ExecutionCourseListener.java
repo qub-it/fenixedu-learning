@@ -36,26 +36,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExecutionCourseListener {
-    
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutionCourseListener.class);
-    
+
     public static Site create(ExecutionCourse executionCourse) {
-        Site newSite = ExecutionCourseSiteBuilder.getInstance().create(
-                executionCourse.getNameI18N(),
-                getObjectives(executionCourse)
-                        .orElseGet(() -> executionCourse.getNameI18N()),
+        Site newSite = ExecutionCourseSiteBuilder.getInstance().create(executionCourse.getNameI18N(),
+                getObjectives(executionCourse).orElseGet(() -> executionCourse.getNameI18N()),
                 formatSlugForExecutionCourse(executionCourse));
-        
+
         executionCourse.setSite(newSite);
-    
+
         RoleTemplate defaultTemplate = newSite.getDefaultRoleTemplate();
-        if (defaultTemplate != null ) {
-            Role teacherRole =
-            new Role(defaultTemplate, executionCourse.getSite());
-    
+        if (defaultTemplate != null) {
+            Role teacherRole = new Role(defaultTemplate, executionCourse.getSite());
+
             Group group = teacherRole.getGroup();
-            for(Professorship pr : executionCourse.getProfessorshipsSet()) {
+            for (Professorship pr : executionCourse.getProfessorshipsSet()) {
                 User user = pr.getPerson().getUser();
                 if (pr.getPermissions().getSections() && !group.isMember(user)) {
                     group = group.grant(user);
@@ -71,7 +67,6 @@ public class ExecutionCourseListener {
         logger.info("Created site for execution course " + executionCourse.getSigla());
         return newSite;
     }
-    
 
     private static Optional<LocalizedString> getObjectives(ExecutionCourse executionCourse) {
         return executionCourse.getCompetenceCourses().stream()
@@ -79,39 +74,13 @@ public class ExecutionCourseListener {
                 .filter(Objects::nonNull).findFirst();
     }
 
-    
-    
     private static String formatSlugForExecutionCourse(ExecutionCourse executionCourse) {
         return on("-").join(executionCourse.getSigla(), executionCourse.getExternalId());
     }
-    
+
     public static void updateSiteSlug(ExecutionCourse instance) {
         instance.getSite().setSlug(formatSlugForExecutionCourse(instance));
         instance.setSiteUrl(instance.getSite().getFullUrl());
     }
 
-    public static void updateProfessorship(Professorship professorship, Boolean allowAccess ) {
-        ExecutionCourse executionCourse = professorship.getExecutionCourse();
-    
-        RoleTemplate defaultTemplate = executionCourse.getSite().getDefaultRoleTemplate();
-        if (defaultTemplate != null ) {
-            Role teacherRole = executionCourse.getSite().getRolesSet().stream()
-                    .filter(role -> role.getRoleTemplate().equals(defaultTemplate))
-                    .findAny().orElseGet(() -> new Role(defaultTemplate, executionCourse.getSite()));
-        
-            Group group = teacherRole.getGroup();
-            
-            User user = professorship.getPerson().getUser();
-            if(allowAccess && !group.isMember(user)){
-                group=group.grant(user);
-                teacherRole.setGroup(group);
-            } else if(group.isMember(user)) {
-                group=group.revoke(user);
-                teacherRole.setGroup(group);
-            }
-        } else {
-            throw new DomainException("no.default.role");
-        }
-    
-    }
 }
