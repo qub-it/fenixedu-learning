@@ -51,14 +51,14 @@ public class ExecutionCourseListener {
             Role teacherRole = new Role(defaultTemplate, executionCourse.getSite());
 
             Group group = teacherRole.getGroup();
-            for (Professorship pr : executionCourse.getProfessorshipsSet()) {
-                User user = pr.getPerson().getUser();
-                if (pr.getPermissions().getSections() && !group.isMember(user)) {
-                    group = group.grant(user);
-                } else if (group.isMember(user)) {
-                    group = group.revoke(user);
-                }
-            }
+//            for (Professorship pr : executionCourse.getProfessorshipsSet()) {
+//                User user = pr.getPerson().getUser();
+//                if (pr.getPermissions().getSections() && !group.isMember(user)) {
+//                    group = group.grant(user);
+//                } else if (group.isMember(user)) {
+//                    group = group.revoke(user);
+//                }
+//            }
             teacherRole.setGroup(group);
         } else {
             throw new DomainException("no.default.role");
