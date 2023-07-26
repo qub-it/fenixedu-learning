@@ -131,9 +131,9 @@ public class EventsResource {
         Optional<Site> site = Optional.ofNullable(lesson.getExecutionCourse().getSite());
         String url = site.isPresent() ? site.get().getFullUrl() : "#";
         String executionCourseAcronym = lesson.getShift().getExecutionCourse().getPrettyAcronym();
-        String shiftTypeAcronym = lesson.getShift().getShiftTypesCodePrettyPrint();
+        String shiftTypeAcronym = lesson.getShift().getCourseLoadType().getInitials().getContent();
         String executionCourseName = lesson.getShift().getExecutionCourse().getNameI18N().getContent();
-        String shifType = lesson.getShift().getShiftTypesPrettyPrint();
+        String shifType = lesson.getShift().getCourseLoadType().getName().getContent();
         Set<Space> location =
                 lesson.getLessonSpaceOccupation() != null ? lesson.getLessonSpaceOccupation().getSpaces() : newHashSet();
         String description = executionCourseName + "( " + shifType + " )";

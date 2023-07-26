@@ -27,8 +27,8 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.google.common.collect.ComparisonChain;
 
 public class LessonBean implements Comparable<LessonBean> {
-    private static final String[] COLORS = new String[] { "CCAE87", "997649", "FFE8E0", "BECC87", "#FF9999", "#FFCC99",
-            "#FFFF99", "#CCFF99", "#99FF99", "#99FF88" };
+    private static final String[] COLORS = new String[] { "CCAE87", "997649", "FFE8E0", "BECC87", "#FF9999", "#FFCC99", "#FFFF99",
+            "#CCFF99", "#99FF99", "#99FF88" };
 
     private final InfoLessonInstanceAggregation info;
 
@@ -78,11 +78,11 @@ public class LessonBean implements Comparable<LessonBean> {
     }
 
     public String getShiftType() {
-        return info.getShift().getShiftTypesPrettyPrint();
+        return info.getShift().getCourseLoadType().getName().getContent();
     }
 
     public String getShiftTypeCode() {
-        return info.getShift().getShiftTypesCodePrettyPrint();
+        return info.getShift().getCourseLoadType().getInitials().getContent();
     }
 
     public String getShiftSpace() {

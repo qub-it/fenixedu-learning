@@ -1,4 +1,5 @@
 - Refactor: Remove reference to deprecated ProfessorshipPermissions
+- Refactor: Replace shift type references
 
 3.10.14-FORK (20-07-2023)
 - Refactor: Remove reference to deprecated ProfessorshipPermissions
