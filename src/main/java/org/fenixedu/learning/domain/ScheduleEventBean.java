@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.CourseLoad;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.academic.domain.Shift;
@@ -96,13 +95,11 @@ public class ScheduleEventBean implements Comparable<ScheduleEventBean> {
 
     public static Collection<ScheduleEventBean> forExecutionCourse(ExecutionCourse executionCourse, Interval interval) {
         List<ScheduleEventBean> events = Lists.newArrayList();
-        for (CourseLoad courseLoad : executionCourse.getCourseLoadsSet()) {
-            for (Shift shift : courseLoad.getShiftsSet()) {
-                for (Lesson lesson : shift.getAssociatedLessonsSet()) {
-                    for (Interval lessonInterval : lesson.getAllLessonIntervals()) {
-                        if (interval.contains(lessonInterval)) {
-                            events.add(scheduleEvent(shift, lesson, lessonInterval));
-                        }
+        for (Shift shift : executionCourse.getShiftsSet()) {
+            for (Lesson lesson : shift.getAssociatedLessonsSet()) {
+                for (Interval lessonInterval : lesson.getAllLessonIntervals()) {
+                    if (interval.contains(lessonInterval)) {
+                        events.add(scheduleEvent(shift, lesson, lessonInterval));
                     }
                 }
             }
