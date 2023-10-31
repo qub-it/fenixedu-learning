@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -276,20 +277,24 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public String getContactLoad() {
-            Double load = curricularCourse.getContactLoad(null, executionInterval);
+            final CompetenceCourse competenceCourse = curricularCourse.getCompetenceCourse();
+            final Double load = competenceCourse != null ? competenceCourse.getContactLoad(executionInterval) : 0.0;
             return new BigDecimal(load).setScale(2, RoundingMode.HALF_EVEN).toPlainString();
         }
 
         public String getAutonomousWorkHours() {
-            return curricularCourse.getAutonomousWorkHours(null, executionInterval).toString();
+            final CompetenceCourse competenceCourse = curricularCourse.getCompetenceCourse();
+            return Double.toString(competenceCourse != null ? competenceCourse.getAutonomousWorkHours(executionInterval) : 0.0);
         }
 
         public String getTotalLoad() {
-            return curricularCourse.getTotalLoad(null, executionInterval).toString();
+            final CompetenceCourse competenceCourse = curricularCourse.getCompetenceCourse();
+            return Double.toString(competenceCourse != null ? competenceCourse.getTotalLoad(executionInterval) : 0.0);
         }
 
         public String getECTS() {
-            return curricularCourse.getEctsCredits((CurricularPeriod) null, executionInterval).toString();
+            final CompetenceCourse competenceCourse = curricularCourse.getCompetenceCourse();
+            return Double.toString(competenceCourse != null ? competenceCourse.getEctsCredits(executionInterval) : 0.0);
         }
 
         public boolean hasCompentenceCourse() {

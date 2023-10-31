@@ -1,3 +1,4 @@
+- Refactor: Replace curricular course load getters by competence course [#qubIT-Fenix-1587]
 - Refactor: Remove reference to deprecated ProfessorshipPermissions
 - Refactor: Replace shift type references
 
