@@ -46,7 +46,7 @@ abstract public class DegreeCurricularPlanServices {
 
     static private Predicate<DegreeCurricularPlan> predicateDCP(final ExecutionYear year) {
         return plan -> {
-            return plan.isApproved() && plan.isActive() && plan.hasExecutionDegreeFor(year)
+            return plan.isActive() && plan.hasExecutionDegreeFor(year)
                     && !plan.getCurricularCoursesWithExecutionIn(year).isEmpty();
         };
     }
