@@ -106,7 +106,7 @@ public class LessonBean implements Comparable<LessonBean> {
     }
 
     public String getColor() {
-        int id = info.getShift().getTypes().stream().findFirst().get().ordinal();
+        int id = info.getShift().getCourseLoadType().getDisplayOrder();
         return COLORS[id % COLORS.length];
     }
 
