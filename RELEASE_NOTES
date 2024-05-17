@@ -1,3 +1,5 @@
+- Refactor: Uses fullAvatarUrl for avatarUrl refactoring [#qubIT-Omnis-5848] 
+
 3.11.0-FORK (16-05-2024)
 - Refactor: Removes spring controllers [#qubIT-Omnis-5834]
 
