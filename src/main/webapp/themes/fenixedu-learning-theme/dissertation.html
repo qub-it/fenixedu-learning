@@ -14,19 +14,19 @@
 {% endblock header %}
 
 {% macro orientatorCard(advisor, size, misteryMan) %}
-    {{ personCard(advisor.name, advisor.person.homepageWebAddress, advisor.person is null ? misteryMan : advisor.person.user.profile.avatarUrl , advisor.type.name, advisor.affiliation, advisor.category, size) }}
+    {{ personCard(advisor.name, advisor.person.homepageWebAddress, advisor.person is null ? misteryMan : advisor.person.user.profile.fullAvatarUrl , advisor.type.name, advisor.affiliation, advisor.category, size) }}
 {% endmacro %}
 
 {% macro studentCard(student, size) %}
-    {{ personCard(student.person.presentationName, student.person.homepageWebAddress, student.person.user.profile.avatarUrl, 'STUDENT', null, null, size) }}
+    {{ personCard(student.person.presentationName, student.person.homepageWebAddress, student.person.user.profile.fullAvatarUrl, 'STUDENT', null, null, size) }}
 {% endmacro %}
 
-{% macro personCard(name, homepageWebAddress, avatarUrl, type, affiliation, category, size) %}
+{% macro personCard(name, homepageWebAddress, fullAvatarUrl, type, affiliation, category, size) %}
 <div class="participant-card col-md-{{ size }} row text-center">
 
     <div class="person-photo row">
         <a href="{{ homepageWebAddress }}">
-            <img class="img-circle" height='100' width='100' alt="{{ name }}" src="{{ avatarUrl }}"/>
+            <img class="img-circle" height='100' width='100' alt="{{ name }}" src="{{ fullAvatarUrl }}"/>
         </a>
     </div>
 
