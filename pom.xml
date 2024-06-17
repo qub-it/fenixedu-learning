@@ -10,7 +10,7 @@
 
     <groupId>org.fenixedu</groupId>
     <artifactId>fenixedu-learning</artifactId>
-    <version>3.12.0-FORK</version>
+    <version>3.13.0-FORK</version>
     <packaging>jar</packaging>
 
     <name>FenixEdu Learning</name>
@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>com.qubit.solution.fenixedu</groupId>
                 <artifactId>fenixedu-oss-dependency-management</artifactId>
-                <version>168</version>
+                <version>172</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
