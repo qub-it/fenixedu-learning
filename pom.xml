@@ -19,7 +19,7 @@
 
     <properties>
         <version.com.google.code.gson.gson>2.8.0</version.com.google.code.gson.gson>
-        <version.com.google.guava.guava>21.0</version.com.google.guava.guava>
+        <version.com.google.guava.guava>33.2.1-jre</version.com.google.guava.guava>
         <version.javax.ws.rs.javax.ws.rs.api>2.0</version.javax.ws.rs.javax.ws.rs.api>
         <version.joda.time.joda.time>2.9.7</version.joda.time.joda.time>
         <version.org.jsoup.jsoup>1.7.2</version.org.jsoup.jsoup>
