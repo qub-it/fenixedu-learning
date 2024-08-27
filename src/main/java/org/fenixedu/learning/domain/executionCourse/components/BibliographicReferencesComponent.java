@@ -18,6 +18,7 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,8 @@ public class BibliographicReferencesComponent extends BaseExecutionCourseCompone
         globalContext.put("executionCourse", executionCourse);
         globalContext.put("mainReferences", mainReferences(executionCourse));
         globalContext.put("secondaryReferences", secundaryReferences(executionCourse));
-        globalContext.put("optionalReferences", optionalReferences(executionCourse));
-        globalContext.put("nonOptionalReferences", nonOptionalReferences(executionCourse));
+        globalContext.put("optionalReferences", Collections.emptyList());
+        globalContext.put("nonOptionalReferences", Collections.emptyList());
     }
 
     public List<BibliographicReference> secundaryReferences(ExecutionCourse executionCourse) {
@@ -49,16 +50,6 @@ public class BibliographicReferencesComponent extends BaseExecutionCourseCompone
 
     public List<BibliographicReference> mainReferences(ExecutionCourse executionCourse) {
         return bibliographiReferences(executionCourse).stream().filter(b -> b.isMain()).collect(Collectors.toList());
-    }
-
-    public List<org.fenixedu.academic.domain.BibliographicReference> optionalReferences(ExecutionCourse executionCourse) {
-        return executionCourse.getOrderedBibliographicReferences().stream().filter(b -> b.isOptional())
-                .collect(Collectors.toList());
-    }
-
-    public List<org.fenixedu.academic.domain.BibliographicReference> nonOptionalReferences(ExecutionCourse executionCourse) {
-        return executionCourse.getOrderedBibliographicReferences().stream().filter(b -> !b.isOptional())
-                .collect(Collectors.toList());
     }
 
     public List<BibliographicReference> bibliographiReferences(ExecutionCourse executionCourse) {
