@@ -1,3 +1,4 @@
+3.13.1-FORK (28-08-2024)
 - Refactor: Removes ExecutionCourse.getOrderedBibliographicReferences references [#qubIT-Fenix-1595]
 - Improvement: Updates guava from 21.0 to 33.2.1-jre [#qubIT-Omnis-5869]
 
