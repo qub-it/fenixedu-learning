@@ -20,16 +20,14 @@ package org.fenixedu.learning.domain.executionCourse.components;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.BibliographicReference;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
-import org.fenixedu.academic.domain.degreeStructure.CompetenceCourseInformation;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
-
-import com.google.common.collect.Lists;
 
 @ComponentType(name = "bibliographicReferences", description = "Bibliographic References for an Execution Course")
 public class BibliographicReferencesComponent extends BaseExecutionCourseComponent {
@@ -37,29 +35,20 @@ public class BibliographicReferencesComponent extends BaseExecutionCourseCompone
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
         ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
+
+        Map<Boolean, List<BibliographicReference>> bibliographicReferencesByOptional = bibliographicReferences(executionCourse);
+
         globalContext.put("executionCourse", executionCourse);
-        globalContext.put("mainReferences", mainReferences(executionCourse));
-        globalContext.put("secondaryReferences", secundaryReferences(executionCourse));
+        globalContext.put("mainReferences", bibliographicReferencesByOptional.get(false));
+        globalContext.put("secondaryReferences", bibliographicReferencesByOptional.get(true));
         globalContext.put("optionalReferences", Collections.emptyList());
         globalContext.put("nonOptionalReferences", Collections.emptyList());
     }
 
-    public List<BibliographicReference> secundaryReferences(ExecutionCourse executionCourse) {
-        return bibliographiReferences(executionCourse).stream().filter(b -> b.isSecondary()).collect(Collectors.toList());
-    }
+    private Map<Boolean, List<BibliographicReference>> bibliographicReferences(ExecutionCourse executionCourse) {
 
-    public List<BibliographicReference> mainReferences(ExecutionCourse executionCourse) {
-        return bibliographiReferences(executionCourse).stream().filter(b -> b.isMain()).collect(Collectors.toList());
-    }
-
-    public List<BibliographicReference> bibliographiReferences(ExecutionCourse executionCourse) {
-        final List<BibliographicReference> references = Lists.newArrayList();
-        for (CompetenceCourseInformation competenceCourseInfo : executionCourse.getCompetenceCoursesInformations()) {
-            if (competenceCourseInfo.getBibliographicReferences() != null) {
-                references.addAll(competenceCourseInfo.getBibliographicReferences().getBibliographicReferencesSortedByOrder());
-            }
-        }
-        return references;
+        return executionCourse.getCompetenceCourses().stream().flatMap(cc -> cc.findBibliographies())
+                .sorted(BibliographicReference.COMPARATOR_BY_ORDER).collect(Collectors.partitioningBy(br -> br.isOptional()));
     }
 
 }
