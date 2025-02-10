@@ -1,3 +1,5 @@
+- Refactor: Refactor curricular plans template due to removal of legacy end date variable in degree curricular plan [#qubIT-Fenix-6588]
+
 3.13.2-FORK (10-09-2024)
 - Refactor: Migration of bibliographic references from value types to domain entities [#qubIT-Fenix-1595] 
 

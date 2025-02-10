@@ -7,13 +7,7 @@
 		<h2>
 			{{ degreeCurricularPlan.name }} 
 			<small>
-				{% if degreeCurricularPlan.initialDate is not empty and degreeCurricularPlan.endDate is not empty %}
-						{{ i18n(bundle, 'public.degree.information.label.of') }} 
-						{{ degreeCurricularPlan.initialDate | date('yyyy') }} 
-						{{ i18n(bundle, 'public.degree.information.label.to') }} 
-						{{ degreeCurricularPlan.endDate | date('yyyy')}} 
-					
-				{% elseif degreeCurricularPlan.initialDate is not empty and degreeCurricularPlan.endDate is empty %}
+				{% if degreeCurricularPlan.initialDate is not empty %}
 					{{ i18n(bundle, 'public.degree.information.label.since') }} {{ degreeCurricularPlan.initialDate | date("yyyy") }}
 				{% endif %}
 			</small>
