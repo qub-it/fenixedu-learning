@@ -1,3 +1,5 @@
+- Refactor: Replace hardcoded degree info fields references with dynamic fields [#UL-REIT-4703]
+
 3.13.3-FORK (11-02-2025)
 - Refactor: Refactor curricular plans template due to removal of legacy end date variable in degree curricular plan [#qubIT-Fenix-6588]
 

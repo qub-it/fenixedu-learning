@@ -30,6 +30,8 @@ import org.fenixedu.academic.domain.DegreeInfo;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.dml.DynamicField;
+import org.fenixedu.academic.domain.dml.DynamicFieldDescriptor;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
@@ -41,6 +43,8 @@ import pt.ist.fenixframework.FenixFramework;
 
 @ComponentType(name = "degreeDescription", description = "Description of a Degree")
 public class DescriptionComponent extends DegreeSiteComponent {
+
+    private static final String DYNAMIC_FIELD_WEBSITE_PROVIDER_TAG = "degreeInfo_";
 
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext global) {
@@ -66,6 +70,10 @@ public class DescriptionComponent extends DegreeSiteComponent {
             degreeInfo = degree.getMostRecentDegreeInfo(targetExecutionYear.getAcademicInterval());
         }
         global.put("degreeInfo", degreeInfo);
+
+        final DegreeInfo finalDegreeInfo = degreeInfo;
+        DynamicFieldDescriptor.find(degreeInfo).forEach(d -> global.put(DYNAMIC_FIELD_WEBSITE_PROVIDER_TAG + d.getCode(),
+                DynamicField.getFieldValue(finalDegreeInfo, d.getCode())));
 
     }
 

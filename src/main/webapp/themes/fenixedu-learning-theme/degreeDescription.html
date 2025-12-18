@@ -47,11 +47,11 @@
 	<p><em> {{ i18n('resources.ApplicationResources','error.public.DegreeInfoNotPresent') }}</em></p>
 {% else %}
 		<!-- ANNOUNCEMENTS and DEADLINES -->
-		{% set deadlines =  degreeInfo.schoolCalendar is not empty or 
-							degreeInfo.candidacyPeriod is not empty or 
-							degreeInfo.selectionResultDeadline is not empty or 
-							degreeInfo.enrolmentPeriod is not empty %}
-		{% if deadlines or announcements is not empty or degreeInfo.additionalInfo is not empty or degreeInfo.links is not empty %}
+		{% set deadlines =  degreeInfo_schoolCalendar is not empty or
+							degreeInfo_candidacyPeriod is not empty or
+							degreeInfo_selectionResultDeadline is not empty or
+							degreeInfo_enrolmentPeriod is not empty %}
+		{% if deadlines or announcements is not empty or degreeInfo_additionalInfo is not empty or degreeInfo_links is not empty %}
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -83,23 +83,23 @@
             {% if deadlines %}
               {{ titleRow('public.degree.information.label.deadlines') }}
         {% endif %}
-        {{ deadline('public.degree.information.label.schoolCalendar',degreeInfo.schoolCalendar) }}
-        {{ deadline('public.degree.information.label.candidacyPeriod', degreeInfo.candidacyPeriod) }}
-        {{ deadline('public.degree.information.label.selectionResultDeadline'. degreeInfo.selectionResultDeadline) }}
-        {{ deadline('public.degree.information.label.enrolmentPeriod',degreeInfo.enrolmentPeriod) }}
-            {% if degreeInfo.additionalInfo is not empty %}
+        {{ deadline('public.degree.information.label.schoolCalendar',degreeInfo_schoolCalendar) }}
+        {{ deadline('public.degree.information.label.candidacyPeriod', degreeInfo_candidacyPeriod) }}
+        {{ deadline('public.degree.information.label.selectionResultDeadline'. degreeInfo_selectionResultDeadline) }}
+        {{ deadline('public.degree.information.label.enrolmentPeriod',degreeInfo_enrolmentPeriod) }}
+            {% if degreeInfo_additionalInfo is not empty %}
               {{ titleRow('public.degree.information.label.additionalInfo') }}
           <tr>
                 <td>
-                  {{ degreeInfo.additionalInfo.content | raw}}
+                  {{ degreeInfo_additionalInfo.content | raw}}
             </td>
           </tr>
         {% endif %}
-            {% if degreeInfo.links is not empty and degreeInfo.links.content is not empty %}
+            {% if degreeInfo_links is not empty and degreeInfo_links.content is not empty %}
               {{ titleRow('public.degree.information.label.links') }}
           <tr>
                 <td>
-                  {{ degreeInfo.links.content | raw }}
+                  {{ degreeInfo_links.content | raw }}
             </td>
           </tr>
         {% endif %}
@@ -114,24 +114,24 @@
 
 		{% endif %}
 
-		{{ descriptionSection('public.degree.information.label.overview', degreeInfo.description) }}
-		{{ descriptionSection('public.degree.information.label.history', degreeInfo.history) }}
-		{{ descriptionSection('public.degree.information.label.objectives', degreeInfo.objectives) }}
-		{{ descriptionSection('public.degree.information.label.designedFor', degreeInfo.designedFor) }}
-		{{ descriptionSection('public.degree.information.label.professionalExits', degreeInfo.professionalExits) }}
-		{{ descriptionSection('public.degree.information.label.operationalRegime', degreeInfo.operationalRegime) }}
-		{{ descriptionSection('public.degree.information.label.gratuity', degreeInfo.gratuity) }}
+		{{ descriptionSection('public.degree.information.label.overview', degreeInfo_description) }}
+		{{ descriptionSection('public.degree.information.label.history', degreeInfo_history) }}
+		{{ descriptionSection('public.degree.information.label.objectives', degreeInfo_objectives) }}
+		{{ descriptionSection('public.degree.information.label.designedFor', degreeInfo_designedFor) }}
+		{{ descriptionSection('public.degree.information.label.professionalExits', degreeInfo_professionalExits) }}
+		{{ descriptionSection('public.degree.information.label.operationalRegime', degreeInfo_operationalRegime) }}
+		{{ descriptionSection('public.degree.information.label.gratuity', degreeInfo_gratuity) }}
 		
 		
-		{% if 	degreeInfo.description is empty and
-				degreeInfo.history is empty and
-				degreeInfo.objectives is empty and
-				degreeInfo.designedFor is empty and
-				degreeInfo.professionalExits is empty and
-				degreeInfo.operationalRegime is empty and
-				degreeInfo.gratuity is empty and
-				degreeInfo.additionalInfo is empty and
-				degreeInfo.links is empty and
+		{% if 	degreeInfo_description is empty and
+				degreeInfo_history is empty and
+				degreeInfo_objectives is empty and
+				degreeInfo_designedFor is empty and
+				degreeInfo_professionalExits is empty and
+				degreeInfo_operationalRegime is empty and
+				degreeInfo_gratuity is empty and
+				degreeInfo_additionalInfo is empty and
+				degreeInfo_links is empty and
 				not deadlines %}
 			<p><i>{{ i18n('resources.PublicDegreeInformation','not.available') }}</i></p>
 		{% endif %}
