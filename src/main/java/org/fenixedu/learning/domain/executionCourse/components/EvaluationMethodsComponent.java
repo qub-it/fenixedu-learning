@@ -18,7 +18,6 @@
  */
 package org.fenixedu.learning.domain.executionCourse.components;
 
-import java.util.Locale;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
@@ -42,7 +41,6 @@ public class EvaluationMethodsComponent extends BaseExecutionCourseComponent {
     }
 
     private LocalizedString getEvaluationMethod(final ExecutionCourse executionCourse) {
-
         final Set<CompetenceCourse> competences = executionCourse.getCompetenceCourses();
         final CompetenceCourse competence = competences.isEmpty() ? null : competences.iterator().next();
 
@@ -50,11 +48,10 @@ public class EvaluationMethodsComponent extends BaseExecutionCourseComponent {
             final CompetenceCourseInformation information =
                     competence.findInformationMostRecentUntil(executionCourse.getExecutionInterval());
             if (information != null) {
-                return new LocalizedString(Locale.getDefault(), information.getEvaluationMethod()).with(Locale.ENGLISH,
-                        information.getEvaluationMethodEn());
+                LocalizedString evaluationMethod = information.getEvaluationMethodI18N();
+                return evaluationMethod != null ? evaluationMethod : new LocalizedString();
             }
         }
-
         return new LocalizedString();
     }
 
