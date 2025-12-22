@@ -10,7 +10,7 @@
 
     <groupId>org.fenixedu</groupId>
     <artifactId>fenixedu-learning</artifactId>
-    <version>3.13.4-FORK</version>
+    <version>3.13.5-FORK</version>
     <packaging>jar</packaging>
 
     <name>FenixEdu Learning</name>
