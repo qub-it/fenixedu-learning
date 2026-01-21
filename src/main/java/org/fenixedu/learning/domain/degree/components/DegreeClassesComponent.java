@@ -22,11 +22,10 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.fenixedu.academic.domain.SchoolClass.COMPARATOR_BY_NAME;
-import static org.fenixedu.academic.util.PeriodState.NOT_OPEN;
 import static org.fenixedu.academic.util.PeriodState.OPEN;
-import static org.fenixedu.bennu.core.security.Authenticate.getUser;
 import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -36,10 +35,7 @@ import java.util.function.Predicate;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionInterval;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.SchoolClass;
-import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.dto.InfoDegree;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
@@ -56,7 +52,7 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext global) {
         Degree degree = degree(page);
-        global.put("degreeInfo", InfoDegree.newInfoFromDomain(degree));
+        global.put("degreeInfo", new InfoDegree(degree));
         global.put("timetablePage",
                 pageForComponent(page.getSite(), ClassScheduleComponent.class).map(Page::getAddress).orElse(null));
 
@@ -82,14 +78,22 @@ public class DegreeClassesComponent extends DegreeSiteComponent {
     }
 
     private boolean canViewNextExecutionSemester(ExecutionInterval nextExecutionSemester) {
-        Predicate<Person> hasPerson = person -> person != null;
-        Predicate<Person> isCoordinator = person -> RoleType.COORDINATOR.isMember(person.getUser());
-        Predicate<Person> isManager = person -> RoleType.RESOURCE_ALLOCATION_MANAGER.isMember(person.getUser());
-        return nextExecutionSemester.getState() == OPEN || (nextExecutionSemester.getState() == NOT_OPEN && getUser() != null
-                && hasPerson.and(isManager.or(isCoordinator)).test(getUser().getPerson()));
+        return nextExecutionSemester.getState() == OPEN;
     }
 
     private ExecutionInterval getExecutionSemester(String[] requestContext) {
         return requestContext.length > 2 ? getDomainObject(requestContext[1]) : ExecutionInterval.findFirstCurrentChild(null);
+    }
+
+    public static class InfoDegree implements Serializable {
+        private Degree degree;
+
+        public InfoDegree(Degree degree) {
+            this.degree = degree;
+        }
+
+        public Degree getDegree() {
+            return this.degree;
+        }
     }
 }
