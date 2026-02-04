@@ -1,3 +1,6 @@
+- Improvement: Show rooms directly in timetable cell [#UL-FC-5857]
+- Bug fix: Show lesson instances rooms in school class timetable [#UL-FC-5857]
+
 3.13.6-FORK (21-01-2026)
 - Refactor: Remove references to deprecated DTOs [#qubIT-Fenix-1607]
 

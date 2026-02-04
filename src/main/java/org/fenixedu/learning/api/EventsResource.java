@@ -18,7 +18,6 @@
  */
 package org.fenixedu.learning.api;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.fenixedu.academic.domain.ExecutionYear.COMPARATOR_BY_YEAR;
@@ -29,6 +28,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.GET;
@@ -134,11 +134,16 @@ public class EventsResource {
         String shiftTypeAcronym = lesson.getShift().getCourseLoadType().getInitials().getContent();
         String executionCourseName = lesson.getShift().getExecutionCourse().getNameI18N().getContent();
         String shifType = lesson.getShift().getCourseLoadType().getName().getContent();
-        Set<Space> location =
-                lesson.getLessonSpaceOccupation() != null ? lesson.getLessonSpaceOccupation().getSpaces() : newHashSet();
         String description = executionCourseName + "( " + shifType + " )";
-        return new ScheduleEventBean(executionCourseAcronym, shiftTypeAcronym, description, interval.getStart(),
-                interval.getEnd(), null, url, null, null, location);
+
+        final LocalDate lessonDate = interval.getStart().toLocalDate();
+        final Set<Space> spaces =
+                lesson.getLessonInstancesSet().stream().filter(li -> li.getBeginDateTime().toLocalDate().equals(lessonDate))
+                        .findAny().map(li -> li.getSpaces()).orElseGet(() -> lesson.getSpaces()).collect(Collectors.toSet());
+        final String spacesNames = spaces.stream().map(Space::getName).collect(Collectors.joining(","));
+
+        return new ScheduleEventBean(executionCourseAcronym, shiftTypeAcronym + " " + spacesNames, description,
+                interval.getStart(), interval.getEnd(), null, url, null, null, spaces);
     }
 
     private Interval getInterval(String start, String end) {
