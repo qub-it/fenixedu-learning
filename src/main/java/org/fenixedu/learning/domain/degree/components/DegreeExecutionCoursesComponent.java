@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionInterval;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
@@ -89,10 +90,16 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
             final ExecutionInterval... executionPeriods) {
         for (final Context context : courseGroup.getChildContextsSet()) {
             for (final ExecutionInterval executionSemester : executionPeriods) {
-                if (context.isValid(executionSemester)) {
+                if (context.isValid(executionSemester) && !isUnavailableOnSitesAndAPIsRule(context.getParentCourseGroup(),
+                        executionSemester.getExecutionYear())) {
                     final DegreeModule degreeModule = context.getChildDegreeModule();
                     if (degreeModule.isLeaf()) {
                         final CurricularCourse curricularCourse = (CurricularCourse) degreeModule;
+
+                        if (isUnavailableOnSitesAndAPIsRule(curricularCourse, executionSemester.getExecutionYear())) {
+                            continue;
+                        }
+
                         for (final ExecutionCourse executionCourse : curricularCourse.getAssociatedExecutionCoursesSet()) {
                             if (executionCourse.getExecutionPeriod() == executionSemester) {
                                 courses.computeIfAbsent(context.getCurricularYear(),
@@ -107,5 +114,10 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
                 }
             }
         }
+    }
+
+    private static boolean isUnavailableOnSitesAndAPIsRule(DegreeModule degreeModule, ExecutionYear executionYear) {
+        return degreeModule.getCurricularRulesSet().stream()
+                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule") && r.isValid(executionYear));
     }
 }
