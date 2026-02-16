@@ -40,13 +40,13 @@ import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 import org.fenixedu.academic.domain.curricularRules.CurricularRule;
 import org.fenixedu.academic.domain.curricularRules.EnrolmentToBeApprovedByCoordinator;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
-import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
 import org.fenixedu.academic.domain.degreeStructure.RegimeType;
 import org.fenixedu.academic.util.CurricularPeriodLabelFormatter;
 import org.fenixedu.academic.util.CurricularRuleLabelFormatter;
@@ -154,9 +154,10 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         return result;
     }
 
-    private static boolean isUnavailableOnSitesAndAPIsRule(DegreeModule degreeModule, ExecutionYear executionYear) {
-        return degreeModule.getCurricularRulesSet().stream()
-                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule") && r.isValid(executionYear));
+    private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
+        return context.getChildDegreeModule().getCurricularRules(executionInterval).stream().anyMatch(
+                r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule") && r.isValid(executionInterval) && (
+                        r.getContextCourseGroup() == null || r.getContextCourseGroup() == context.getParentCourseGroup()));
     }
 
     private class CourseGroupWrap extends Wrap {
@@ -189,8 +190,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         public Stream<CurricularCourseWrap> getCurricularCourses() {
             return courseGroup.getOpenChildContextsForExecutionAggregation(CurricularCourse.class, executionInterval).stream()
                     // exclude courses with UnavailableOnSitesAndAPIsRule rule
-                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context.getChildDegreeModule(),
-                            executionInterval.getExecutionYear()))
+                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context, executionInterval))
                     .sorted().map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl))
 
                     // qubExtension, don't show courses with some rules
@@ -200,8 +200,7 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         public Stream<CourseGroupWrap> getCourseGroups() {
             return courseGroup.getOpenChildContextsForExecutionAggregation(CourseGroup.class, executionInterval).stream()
                     // exclude courses with UnavailableOnSitesAndAPIsRule rule
-                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context.getChildDegreeModule(),
-                            executionInterval.getExecutionYear())).sorted()
+                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context, executionInterval)).sorted()
                     .map(context -> new CourseGroupWrap(context, (CourseGroup) context.getChildDegreeModule(), executionInterval,
                             pageUrl));
         }
