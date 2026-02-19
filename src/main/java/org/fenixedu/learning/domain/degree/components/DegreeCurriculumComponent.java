@@ -155,9 +155,8 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
     }
 
     private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
-        return context.getChildDegreeModule().getCurricularRules(executionInterval).stream().anyMatch(
-                r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule") && r.isValid(executionInterval) && (
-                        r.getContextCourseGroup() == null || r.getContextCourseGroup() == context.getParentCourseGroup()));
+        return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
+                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule"));
     }
 
     private class CourseGroupWrap extends Wrap {

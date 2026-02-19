@@ -89,15 +89,10 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
             final ExecutionInterval... executionPeriods) {
         for (final Context context : courseGroup.getChildContextsSet()) {
             for (final ExecutionInterval executionSemester : executionPeriods) {
-                if (context.isValid(executionSemester)) {
+                if (context.isValid(executionSemester) && !isUnavailableOnSitesAndAPIsRule(context, executionSemester)) {
                     final DegreeModule degreeModule = context.getChildDegreeModule();
                     if (degreeModule.isLeaf()) {
                         final CurricularCourse curricularCourse = (CurricularCourse) degreeModule;
-
-                        if (isUnavailableOnSitesAndAPIsRule(context, executionSemester)) {
-                            continue;
-                        }
-
                         for (final ExecutionCourse executionCourse : curricularCourse.getAssociatedExecutionCoursesSet()) {
                             if (executionCourse.getExecutionPeriod() == executionSemester) {
                                 courses.computeIfAbsent(context.getCurricularYear(),
@@ -107,9 +102,6 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
                         }
                     } else {
                         final CourseGroup childCourseGroup = (CourseGroup) degreeModule;
-                        if (isUnavailableOnSitesAndAPIsRule(context, executionSemester)) {
-                            continue;
-                        }
                         addExecutionCourses(childCourseGroup, courses, executionPeriods);
                     }
                 }
@@ -118,8 +110,7 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
     }
 
     private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
-        return context.getChildDegreeModule().getCurricularRules(executionInterval).stream().anyMatch(
-                r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule") && r.isValid(executionInterval) && (
-                        r.getContextCourseGroup() == null || r.getContextCourseGroup() == context.getParentCourseGroup()));
+        return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
+                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule"));
     }
 }
