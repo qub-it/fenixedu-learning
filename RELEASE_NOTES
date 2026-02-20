@@ -1,3 +1,5 @@
+- Improvement: Hides unavailable courses from CMS components [#qubIT-Fenix-8005]
+
 3.13.7-FORK (04-02-2026)
 - Improvement: Show rooms directly in timetable cell [#UL-FC-5857]
 - Bug fix: Show lesson instances rooms in school class timetable [#UL-FC-5857]

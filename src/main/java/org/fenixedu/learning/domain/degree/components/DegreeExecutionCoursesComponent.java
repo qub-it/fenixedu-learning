@@ -89,7 +89,7 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
             final ExecutionInterval... executionPeriods) {
         for (final Context context : courseGroup.getChildContextsSet()) {
             for (final ExecutionInterval executionSemester : executionPeriods) {
-                if (context.isValid(executionSemester)) {
+                if (context.isValid(executionSemester) && !isUnavailableOnSitesAndAPIsRule(context, executionSemester)) {
                     final DegreeModule degreeModule = context.getChildDegreeModule();
                     if (degreeModule.isLeaf()) {
                         final CurricularCourse curricularCourse = (CurricularCourse) degreeModule;
@@ -107,5 +107,10 @@ public class DegreeExecutionCoursesComponent extends DegreeSiteComponent {
                 }
             }
         }
+    }
+
+    private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
+        return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
+                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule"));
     }
 }

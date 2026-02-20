@@ -40,6 +40,7 @@ import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 import org.fenixedu.academic.domain.curricularRules.CurricularRule;
@@ -153,6 +154,11 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         return result;
     }
 
+    private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
+        return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
+                .anyMatch(r -> r.getClass().getSimpleName().equals("UnavailableOnSitesAndAPIsRule"));
+    }
+
     private class CourseGroupWrap extends Wrap {
 
         private final ExecutionYear executionInterval;
@@ -182,6 +188,8 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
 
         public Stream<CurricularCourseWrap> getCurricularCourses() {
             return courseGroup.getOpenChildContextsForExecutionAggregation(CurricularCourse.class, executionInterval).stream()
+                    // exclude courses with UnavailableOnSitesAndAPIsRule rule
+                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context, executionInterval))
                     .sorted().map(context -> new CurricularCourseWrap(context, executionInterval, pageUrl))
 
                     // qubExtension, don't show courses with some rules
@@ -189,7 +197,9 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         }
 
         public Stream<CourseGroupWrap> getCourseGroups() {
-            return courseGroup.getOpenChildContextsForExecutionAggregation(CourseGroup.class, executionInterval).stream().sorted()
+            return courseGroup.getOpenChildContextsForExecutionAggregation(CourseGroup.class, executionInterval).stream()
+                    // exclude courses with UnavailableOnSitesAndAPIsRule rule
+                    .filter(context -> !isUnavailableOnSitesAndAPIsRule(context, executionInterval)).sorted()
                     .map(context -> new CourseGroupWrap(context, (CourseGroup) context.getChildDegreeModule(), executionInterval,
                             pageUrl));
         }
