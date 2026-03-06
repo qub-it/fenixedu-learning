@@ -1,3 +1,4 @@
+3.13.9-FORK (06-03-2026)
 - Refactor: Remove reference to method isApproved() considering deprecated field curricularStage from CompetenceCourse [#qubIT-Fenix-8089]
 
 3.13.8-FORK (20-02-2026)
