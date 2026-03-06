@@ -78,7 +78,6 @@ public class CompetenceCourseBean {
 
     public static List<CompetenceCourseBean> approvedCompetenceCourses(ExecutionCourse executionCourse) {
         return getCurricularCoursesIndexedByCompetenceCourse(executionCourse).entrySet().stream()
-                .filter(entry -> entry.getKey().isApproved())
                 .map(entry -> new CompetenceCourseBean(entry.getKey(), entry.getValue(), executionCourse.getExecutionPeriod()))
                 .collect(Collectors.toList());
     }
