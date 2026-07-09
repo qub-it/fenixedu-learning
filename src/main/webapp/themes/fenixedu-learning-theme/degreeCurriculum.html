@@ -141,7 +141,11 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         {% for year in years %}
-                            <li><a href="?year={{ year.externalId }}">{{ year.year }}</a></li>
+							{% if selectedPlan is empty %}
+							<li><a href="?year={{ year.externalId }}">{{ year.year }}</a></li>
+							{% else %}
+							<li><a href="?year={{ year.externalId }}&amp;&amp;plan={{ selectedPlan.externalId }}">{{ year.year }}</a></li>
+							{% endif %}
                         {% endfor %}
                     </ul>
                 </div>
@@ -178,7 +182,11 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         {% for year in years %}
-                            <li><a href="?year={{ year.externalId }}">{{ year.year }}</a></li>
+							{% if selectedPlan is empty %}
+							<li><a href="?year={{ year.externalId }}">{{ year.year }}</a></li>
+							{% else %}
+							<li><a href="?year={{ year.externalId }}&amp;&amp;plan={{ selectedPlan.externalId }}">{{ year.year }}</a></li>
+							{% endif %}
                         {% endfor %}
                     </ul>
                 </div>
