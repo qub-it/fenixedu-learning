@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -74,13 +75,10 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         site = page.getSite();
         String pageUrl = pageForComponent(site, CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
 
-        ExecutionYear selectedYear = selectedYear((String) globalContext.get("year"), degree, (String) globalContext.get("plan"));
-        // qubExtension
-        final DegreeCurricularPlan plan = selectedPlan((String) globalContext.get("plan"), degree, selectedYear);
-
-        if (plan == null && !plan.hasExecutionDegreeFor(selectedYear)) {
-            selectedYear = plan.getLastExecutionYear();
-        }
+        ParamParser searchParamParser =
+                new ParamParser((String) globalContext.get("year"), (String) globalContext.get("plan"), degree);
+        final ExecutionYear selectedYear = searchParamParser.getExecutionYear();
+        final DegreeCurricularPlan plan = searchParamParser.getDegreeCurricularPlan();
 
         globalContext.put("courseGroups", courseGroups(plan, selectedYear, pageUrl));
         globalContext.put("allCurricularCourses",
@@ -96,6 +94,56 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         globalContext.put("plans", DegreeCurricularPlanServices.getDegreeCurricularPlansForYear(degree, Optional.of(selectedYear))
                 .stream().sorted(DegreeCurricularPlan.COMPARATOR_BY_PRESENTATION_NAME.reversed()).collect(Collectors.toList()));
         globalContext.put("selectedPlan", plan);
+    }
+
+    public class ParamParser {
+
+        private String executionYearOid;
+        private String degreeCurricularPlanOid;
+
+        private ExecutionYear executionYear;
+        private DegreeCurricularPlan degreeCurricularPlan;
+        private Degree degree;
+
+        ParamParser(String executionYearOid, String degreeCurricularPlanOid, final Degree degree) {
+            this.executionYearOid = executionYearOid;
+            this.degreeCurricularPlanOid = degreeCurricularPlanOid;
+            this.degree = degree;
+            search();
+        }
+
+        public ExecutionYear getExecutionYear() {
+            return executionYear;
+        }
+
+        public DegreeCurricularPlan getDegreeCurricularPlan() {
+            return degreeCurricularPlan;
+        }
+
+        private void search() {
+            if (StringUtils.isNotBlank(executionYearOid)) {
+                executionYear = getDomainObject(executionYearOid);
+            } else {
+                //Year param is not optional, but this will be the initial value when entering the page
+                degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
+                executionYear =
+                        degreeCurricularPlan != null ? degreeCurricularPlan.getLastExecutionYear() : ExecutionYear.findCurrent(
+                                degree.getCalendar());
+            }
+
+            if (StringUtils.isNotBlank(degreeCurricularPlanOid)) {
+                degreeCurricularPlan = getDomainObject(degreeCurricularPlanOid);
+            }
+
+            if (degreeCurricularPlan == null) {
+                degreeCurricularPlan =
+                        DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(executionYear));
+            }
+
+            if (!degreeCurricularPlan.hasExecutionDegreeFor(executionYear)) {
+                executionYear = degreeCurricularPlan.getLastExecutionYear();
+            }
+        }
     }
 
     SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(final DegreeCurricularPlan plan,
@@ -119,40 +167,6 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         return root.getCourseGroups();
     }
 
-    ExecutionYear selectedYear(String year, Degree degree, String planOid) {
-        if (!Strings.isNullOrEmpty(year)) {
-            return getDomainObject(year);
-        }
-
-        if (!Strings.isNullOrEmpty(planOid)) {
-            DegreeCurricularPlan plan = getDomainObject(planOid);
-            if (plan != null && plan.getLastExecutionYear() != null) {
-                return plan.getLastExecutionYear();
-            }
-        }
-
-        DegreeCurricularPlan dcp = DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.empty());
-        if (dcp != null) {
-            return dcp.getLastExecutionYear();
-        }
-
-        return ExecutionYear.findCurrent(degree.getCalendar());
-    }
-
-    // qubExtension
-    DegreeCurricularPlan selectedPlan(final String oid, final Degree degree, final ExecutionYear year) {
-        DegreeCurricularPlan result = null;
-
-        if (!Strings.isNullOrEmpty(oid)) {
-            result = getDomainObject(oid);
-        }
-
-        if (result == null) {
-            result = DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(year));
-        }
-
-        return result;
-    }
 
     private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
         return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
