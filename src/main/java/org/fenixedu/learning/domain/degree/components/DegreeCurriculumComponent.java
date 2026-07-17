@@ -75,10 +75,10 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         site = page.getSite();
         String pageUrl = pageForComponent(site, CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
 
-        ParamParser searchParamParser =
-                new ParamParser((String) globalContext.get("year"), (String) globalContext.get("plan"), degree);
-        final ExecutionYear selectedYear = searchParamParser.getExecutionYear();
-        final DegreeCurricularPlan plan = searchParamParser.getDegreeCurricularPlan();
+        DegreeCurricularPlanSelection searchParamParser =
+                find(degree, (String) globalContext.get("year"), (String) globalContext.get("plan"));
+        final ExecutionYear selectedYear = searchParamParser.executionYear();
+        final DegreeCurricularPlan plan = searchParamParser.degreeCurricularPlan();
 
         globalContext.put("courseGroups", courseGroups(plan, selectedYear, pageUrl));
         globalContext.put("allCurricularCourses",
@@ -96,54 +96,35 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         globalContext.put("selectedPlan", plan);
     }
 
-    public class ParamParser {
+    private DegreeCurricularPlanSelection find(Degree degree, String executionYearOid, String degreeCurricularPlanOid) {
 
-        private String executionYearOid;
-        private String degreeCurricularPlanOid;
-
-        private ExecutionYear executionYear;
-        private DegreeCurricularPlan degreeCurricularPlan;
-        private Degree degree;
-
-        ParamParser(String executionYearOid, String degreeCurricularPlanOid, final Degree degree) {
-            this.executionYearOid = executionYearOid;
-            this.degreeCurricularPlanOid = degreeCurricularPlanOid;
-            this.degree = degree;
-            search();
+        ExecutionYear executionYear;
+        DegreeCurricularPlan degreeCurricularPlan = null;
+        if (StringUtils.isNotBlank(executionYearOid)) {
+            executionYear = getDomainObject(executionYearOid);
+        } else {
+            //Year param is not optional, but this will be the initial value when entering the page
+            degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
+            executionYear = degreeCurricularPlan == null ? ExecutionYear.findCurrent(
+                    degree.getCalendar()) : degreeCurricularPlan.getLastExecutionYear();
         }
 
-        public ExecutionYear getExecutionYear() {
-            return executionYear;
+        if (StringUtils.isNotBlank(degreeCurricularPlanOid)) {
+            degreeCurricularPlan = getDomainObject(degreeCurricularPlanOid);
         }
 
-        public DegreeCurricularPlan getDegreeCurricularPlan() {
-            return degreeCurricularPlan;
+        if (degreeCurricularPlan == null) {
+            degreeCurricularPlan =
+                    DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(executionYear));
         }
 
-        private void search() {
-            if (StringUtils.isNotBlank(executionYearOid)) {
-                executionYear = getDomainObject(executionYearOid);
-            } else {
-                //Year param is not optional, but this will be the initial value when entering the page
-                degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
-                executionYear =
-                        degreeCurricularPlan != null ? degreeCurricularPlan.getLastExecutionYear() : ExecutionYear.findCurrent(
-                                degree.getCalendar());
-            }
-
-            if (StringUtils.isNotBlank(degreeCurricularPlanOid)) {
-                degreeCurricularPlan = getDomainObject(degreeCurricularPlanOid);
-            }
-
-            if (degreeCurricularPlan == null) {
-                degreeCurricularPlan =
-                        DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(executionYear));
-            }
-
-            if (!degreeCurricularPlan.hasExecutionDegreeFor(executionYear)) {
-                executionYear = degreeCurricularPlan.getLastExecutionYear();
-            }
+        if (!degreeCurricularPlan.hasExecutionDegreeFor(executionYear)) {
+            executionYear = degreeCurricularPlan.getLastExecutionYear();
         }
+        return new DegreeCurricularPlanSelection(executionYear, degreeCurricularPlan);
+    }
+
+    public record DegreeCurricularPlanSelection(ExecutionYear executionYear, DegreeCurricularPlan degreeCurricularPlan) {
     }
 
     SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(final DegreeCurricularPlan plan,
