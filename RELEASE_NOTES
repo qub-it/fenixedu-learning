@@ -1,3 +1,5 @@
+- Bug fix: In a degree website, when picking plan, we are now able to navigate through years [#UL-FC-6070]
+
 3.13.10-FORK (11-06-2026)
 - Refactor: Removes LearningBootstrapper [#qubIT-Fenix-8343]
 

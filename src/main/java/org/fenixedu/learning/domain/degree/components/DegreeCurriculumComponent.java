@@ -21,7 +21,6 @@ package org.fenixedu.learning.domain.degree.components;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
-import static org.fenixedu.academic.domain.ExecutionYear.readCurrentExecutionYear;
 import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
 import java.math.BigDecimal;
@@ -36,6 +35,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -75,9 +75,10 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         site = page.getSite();
         String pageUrl = pageForComponent(site, CurricularCourseComponent.class).map(Page::getAddress).orElse(null);
 
-        ExecutionYear selectedYear = selectedYear((String) globalContext.get("year"), degree);
-        // qubExtension
-        final DegreeCurricularPlan plan = selectedPlan((String) globalContext.get("plan"), degree, selectedYear);
+        DegreeCurricularPlanSelection searchParamParser =
+                find(degree, (String) globalContext.get("year"), (String) globalContext.get("plan"));
+        final ExecutionYear selectedYear = searchParamParser.executionYear();
+        final DegreeCurricularPlan plan = searchParamParser.degreeCurricularPlan();
 
         globalContext.put("courseGroups", courseGroups(plan, selectedYear, pageUrl));
         globalContext.put("allCurricularCourses",
@@ -93,6 +94,37 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         globalContext.put("plans", DegreeCurricularPlanServices.getDegreeCurricularPlansForYear(degree, Optional.of(selectedYear))
                 .stream().sorted(DegreeCurricularPlan.COMPARATOR_BY_PRESENTATION_NAME.reversed()).collect(Collectors.toList()));
         globalContext.put("selectedPlan", plan);
+    }
+
+    private DegreeCurricularPlanSelection find(Degree degree, String executionYearOid, String degreeCurricularPlanOid) {
+
+        ExecutionYear executionYear;
+        DegreeCurricularPlan degreeCurricularPlan = null;
+        if (StringUtils.isNotBlank(executionYearOid)) {
+            executionYear = getDomainObject(executionYearOid);
+        } else {
+            //Year param is not optional, but this will be the initial value when entering the page
+            degreeCurricularPlan = degree.getMostRecentDegreeCurricularPlan();
+            executionYear = degreeCurricularPlan == null ? ExecutionYear.findCurrent(
+                    degree.getCalendar()) : degreeCurricularPlan.getLastExecutionYear();
+        }
+
+        if (StringUtils.isNotBlank(degreeCurricularPlanOid)) {
+            degreeCurricularPlan = getDomainObject(degreeCurricularPlanOid);
+        }
+
+        if (degreeCurricularPlan == null) {
+            degreeCurricularPlan =
+                    DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(executionYear));
+        }
+
+        if (!degreeCurricularPlan.hasExecutionDegreeFor(executionYear)) {
+            executionYear = degreeCurricularPlan.getLastExecutionYear();
+        }
+        return new DegreeCurricularPlanSelection(executionYear, degreeCurricularPlan);
+    }
+
+    public record DegreeCurricularPlanSelection(ExecutionYear executionYear, DegreeCurricularPlan degreeCurricularPlan) {
     }
 
     SortedMap<CurricularPeriod, Set<CurricularCourseWrap>> coursesByCurricularSemester(final DegreeCurricularPlan plan,
@@ -116,43 +148,6 @@ public class DegreeCurriculumComponent extends DegreeSiteComponent {
         return root.getCourseGroups();
     }
 
-    ExecutionYear selectedYear(String year, Degree degree) {
-        ExecutionYear result = null;
-
-        if (!Strings.isNullOrEmpty(year)) {
-            result = getDomainObject(year);
-        }
-
-        if (result == null) {
-
-            final DegreeCurricularPlan dcp =
-                    DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.empty());
-            if (dcp != null) {
-                result = dcp.getLastExecutionYear();
-            }
-        }
-
-        if (result == null) {
-            result = readCurrentExecutionYear();
-        }
-
-        return result;
-    }
-
-    // qubExtension
-    DegreeCurricularPlan selectedPlan(final String oid, final Degree degree, final ExecutionYear year) {
-        DegreeCurricularPlan result = null;
-
-        if (!Strings.isNullOrEmpty(oid)) {
-            result = getDomainObject(oid);
-        }
-
-        if (result == null) {
-            result = DegreeCurricularPlanServices.getMostRecentDegreeCurricularPlan(degree, Optional.of(year));
-        }
-
-        return result;
-    }
 
     private static boolean isUnavailableOnSitesAndAPIsRule(Context context, ExecutionInterval executionInterval) {
         return context.getChildDegreeModule().getCurricularRules(context, executionInterval).stream()
