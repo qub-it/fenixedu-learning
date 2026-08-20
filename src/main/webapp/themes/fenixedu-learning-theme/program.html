@@ -3,9 +3,7 @@
 {% block content %}
 	{% for info in competenceCourseBeans %}
 
-		{% if info.competenceCourse.isApproved %}
-			<h3>{{ info.name.content }}</h3>
-		{% endif %}
+		<h3>{{ info.name.content }}</h3>
     
     	{% for curricularCourse in info.curricularCourses %}
 
