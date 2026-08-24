@@ -67,7 +67,7 @@ public class DescriptionComponent extends DegreeSiteComponent {
 
         DegreeInfo degreeInfo = degree.getDegreeInfoFor(targetExecutionYear);
         if (degreeInfo == null) {
-            degreeInfo = degree.getMostRecentDegreeInfo(targetExecutionYear.getAcademicInterval());
+            degreeInfo = degree.getMostRecentDegreeInfo(targetExecutionYear);
         }
         global.put("degreeInfo", degreeInfo);
 
