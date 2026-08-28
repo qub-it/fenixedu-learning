@@ -21,11 +21,11 @@ package org.fenixedu.learning.domain;
 import static org.fenixedu.commons.i18n.I18N.getLocale;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Lesson;
@@ -37,7 +37,6 @@ import org.joda.time.Interval;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Created by borgez on 10/14/14.
@@ -118,11 +117,11 @@ public class ScheduleEventBean implements Comparable<ScheduleEventBean> {
     private static ScheduleEventBean scheduleEvent(Shift shift, Lesson lesson, Interval interval) {
         String shiftAcronym = shift.getCourseLoadType().getInitials().getContent();
         String url = "#";
-        String roomName = lesson.getSala() != null ? lesson.getSala().getName() : null;
+        final Stream<Space> spaces = lesson.getSpaces();
+        String roomName = lesson.getSpaces().map(Space::getName).collect(Collectors.joining(","));
         String shiftTypesPrettyPrint = shift.getCourseLoadType().getInitials().getContent();
         String color = ScheduleEventBean.COLORS[shift.getCourseLoadType().getDisplayOrder()];
-        HashSet<Space> spaces = Sets.newHashSet(lesson.getSala());
         return new ScheduleEventBean(shiftAcronym, roomName, shiftTypesPrettyPrint, interval.getStart(), interval.getEnd(), null,
-                url, color, null, spaces);
+                url, color, null, spaces.collect(Collectors.toSet()));
     }
 }
